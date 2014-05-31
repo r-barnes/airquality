@@ -1,0 +1,82 @@
+Connecting to Mongo(put at top of file)
+===================
+var Db           = require('mongodb').Db;
+var mongoClient;
+
+Db.connect("mongodb://localhost:27017/omgtransit", function(err, db) {
+  if(err) {
+    console.log("Error Starting up Mongo!@");
+    console.log(err);
+    return;
+  }
+  console.log('Starting up mongo.');
+  mongoClient = db;
+
+});
+
+
+
+
+
+
+
+
+
+function update_mongo_index(stop_type, stops_to_index){
+  var cursor = mongoClient.collection('mongo_stops').find({stop_type:stop_type},{stop_id:1});
+
+  //Create a hash table of all of the stops we plan to index
+  var stops_to_potentially_insert = {};
+  _.each(stops_to_index, function(stop){
+    stops_to_potentially_insert[stop.stop_id]=stop;
+  });
+
+  cursor.toArray(function(err, stops_in_index){
+    var stops_to_remove = [];
+    _.each(stops_in_index, function(stop){
+      //console.log(JSON.stringify(stop));
+      //Stop isn't present in the insert list, so we add it to the list of stops
+      //we plan to delete
+      if(typeof(stops_to_potentially_insert[stop.stop_id])==="undefined")
+        stops_to_remove.push(stop.stop_id);
+      else //Stop is present on the insert list, so we don't want to insert it twice
+        delete stops_to_potentially_insert[stop.stop_id];
+    });
+
+    var stops_to_insert=[];
+    for(var i in stops_to_potentially_insert)
+      stops_to_insert.push(stops_to_potentially_insert[i]);
+
+    var current_time = moment().unix();
+
+    //console.log(JSON.stringify(stops_to_insert));
+
+    mongoClient.collection('mongo_stops').insert(stops_to_insert, {w:'majority'}, function(err, docs){
+      if(err) console.error('Index update error', err);
+      mongoClient.collection('mongo_stops').remove({stop_type:stop_type, stop_id: {$in: stops_to_remove}}, function(err, docs){
+        if(err) console.error('Index update error', err);
+        mongoClient.collection('mongo_stops').update({stop_type:stop_type}, {$set: {updated:current_time}}, {multi:true}, function(err, docs){
+          if(err)
+            console.error('Index update error', err);
+          else
+            console.error('Index update success.');
+        });
+      });
+    });
+
+  });
+}
+
+
+
+
+
+
+  mongoClient.collection('mongo_stops').geoNear(parseFloat(req.query.lat), parseFloat(req.query.lon), {$maxDistance: distance, num: parseInt(num), query: filter, distanceMultiplier: (3963.1676 * Math.PI / 180.0) }, function(err, result) {
+    if(err) {
+      res.writeHead(401);
+      res.end();
+      return console.dir(err);
+    }
+    res.json( parser.parsers.stop_bulk_format(result.results) );
+  });
