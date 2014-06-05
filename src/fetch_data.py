@@ -4,11 +4,9 @@
 import ftplib
 import psycopg2
 import sys
-import datetime
-import time
-import locale
+import io
 
-encoding = locale.getdefaultlocale()[1]
+#encoding = locale.getdefaultlocale()[1]
 
 db    = psycopg2.connect(database='airquality', user='airq', password='nach0s', host='localhost')
 db.set_isolation_level(0) #Set conneciton to autocommit
@@ -40,6 +38,7 @@ for f in files[0:]:
 
 	#"valid_date", "valid_time", "aqsid", "sitename", "GMT_offset", "parameter_name", "reporting_units", "value", "data_source"
 	print('Parsing data...')
+	data_to_insert = set()
 	for d in data:
 		#try:
 	#		d         = d.decode(encoding)
@@ -62,11 +61,20 @@ for f in files[0:]:
 
 		value     = d[7]
 
-		data_to_insert = (stationid, system, thedate, param, value)
-		try:
-			#dbcur.execute("INSERT INTO measurements (stationid,	system,	datetime,	param, value) VALUES (%s, %s, %s, %s, %s)", data_to_insert)
-			dbcur.execute("EXECUTE measurement_insert (%s, %s, %s, %s, %s)", data_to_insert)
-		except psycopg2.IntegrityError as excp:
-			print(excp.pgerror)
+		datum = (stationid, system, thedate, param, value)
+		data_to_insert.add(datum)
+
+	data_to_insert=["\t".join([str(y) for y in x]) for x in data_to_insert]
+	data_to_insert="\n".join(data_to_insert)
+
+	data_to_insert=io.StringIO(data_to_insert)
+	data_to_insert.seek(0)
+	dbcur.copy_from(data_to_insert, 'measurements')
+
+	#try:
+		#dbcur.execute("INSERT INTO measurements (stationid,	system,	datetime,	param, value) VALUES (%s, %s, %s, %s, %s)", data_to_insert)
+	#	dbcur.execute("EXECUTE measurement_insert (%s, %s, %s, %s, %s)", data_to_insert)
+	#except psycopg2.IntegrityError as excp:
+#		print(excp.pgerror)
 
 	db.commit()
