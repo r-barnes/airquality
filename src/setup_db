@@ -1,0 +1,17 @@
+CREATE DATABASE airquality;
+
+\connect airquality;
+
+CREATE USER airq WITH PASSWORD 'nach0s';
+GRANT ALL PRIVILEGES ON DATABASE airquality TO airq;
+
+CREATE TABLE measurements (
+	stationid CHARACTER(9),
+	system    SMALLINT,
+	datetime  TIMESTAMP,
+	param     SMALLINT,
+	value     REAL,
+	UNIQUE(stationid, system, datetime, param)
+);
+
+GRANT ALL PRIVILEGES ON TABLE measurements TO airq;
