@@ -7,24 +7,36 @@ var _         = require('lodash');
 
 var redisclient = redis.createClient();
 
+var pg            = require('pg');
+var pg_con_string = "postgres://airq:nach0s@localhost/airquality";
+
+
+
+
 function AirNow(){
-  var url="http://bob";
   var headers=["valid_date", "valid_time", "aqsid", "sitename", "GMT_offset", "parameter_name", "reporting_units", "value", "data_source"];
 
   var ftp = new ftpclient({
     host: "ftp.airnowapi.org",
     port: 21,
-    user: "leapingleopard", 
+    user: "leapingleopard",
     pass: "xi7MxOiwrRR_vKeT"
   });
 
+  console.log('Fetching list of hourly files.');
+
   ftp.list('HourlyData', function(err, res){
-    if(err) return;
+    if(err){
+      console.error('Error fetching list of hourly files.', err);
+      return;
+    }
+
+    console.log('Fetched HourlyData file list.');
 
     res = res.split("\r\n");
     for(var i=0;i<res.length;i++)
       res[i]=res[i].substr(res[i].lastIndexOf(' ')+1);
-    
+
     var files = [];
     for(var i=0;i<res.length;i++)
       if(res[i].substr(-3)=='dat')
@@ -34,14 +46,21 @@ function AirNow(){
 
     var download_file=files.slice(-1)[0];
 
+    console.log('Acquiring latest file...');
+
     ftp.get('HourlyData/'+download_file, function(err,socket){
-      if(err) return;
+      if(err){
+        console.error('Failed to get latest hourly file.', err);
+        return;
+      }
+
+      console.log('Latest hourly file acquired.');
 
       var str = "";
       socket.on("data", function(d) { str += d.toString(); });
-      socket.on("close", function(hadErr) {
-        if (hadErr){
-          console.error('There was an error retrieving the file.');
+      socket.on("close", function(err) {
+        if (err){
+          console.error('There was an error retrieving the file.', err);
           return;
         }
 
@@ -55,10 +74,10 @@ function AirNow(){
                 time:  meas_datetime.unix(),
                 value: parseFloat(data.value)
               };
- 
+
               if(typeof(sites[data.aqsid])==='undefined')
                 sites[data.aqsid] = {};
- 
+
              sites[data.aqsid][data.parameter_name.toLowerCase()] = param;
           })
           .on("end", function(){
@@ -81,7 +100,7 @@ function AirNow(){
             });
           });
 
-      }); 
+      });
 
       socket.resume();
 
