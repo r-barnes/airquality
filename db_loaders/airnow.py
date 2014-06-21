@@ -22,12 +22,15 @@ class BaseMonkey:
 
 		self.data_to_insert = set()
 
-	def commit(self):
+	def commit(self, columns=[]):
 		prepped_data = ["\t".join([str(y) for y in x]) for x in self.data_to_insert]
 		prepped_data = "\n".join(prepped_data)
 		prepped_data = io.StringIO(prepped_data)
 		prepped_data.seek(0)
-		self.dbcursor.copy_from(prepped_data, self.table)
+		if columns:
+			self.dbcursor.copy_from(prepped_data, self.table, columns=columns)
+		else:
+			self.dbcursor.copy_from(prepped_data, self.table)
 		self.data_to_insert = set()
 
 class StationMonkey(BaseMonkey):
@@ -36,8 +39,16 @@ class StationMonkey(BaseMonkey):
 		self.table = 'stations'
 
 	def insert(self, stationid, name, lat, lon, elev):
+		lat=float(lat)
+		lon=float(lon)
+		if not (-180<=lat and lat<=180 and -90<=lon and lon<=90):
+			return
 		datum = (stationid, self.system, name, lat, lon, elev)
 		self.data_to_insert.add(datum)
+
+	def commit(self):
+		super().commit(columns=('stationid','system','name','lat','lon','elev'))
+		self.dbcursor.execute("UPDATE stations SET pt = ST_GeomFromText('POINT(' || lat || ' ' || lon || ')',4326);")
 
 class MeasureMonkey(BaseMonkey):
 	def __init__(self, system):
