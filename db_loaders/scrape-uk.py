@@ -6,9 +6,17 @@ from BeautifulSoup import BeautifulSoup
 import webbrowser
 import json
 import datetime
+import csv
 
-COLUMNS = ['End Date', 'End Time', 'PM10', 'Dir', 'Speed', 'Temp', 'NO', 'NO2', 'NOx as NO2',
-           'Nonvolatile PM10', 'Nonvolatile PM2.5', 'O3', 'PM2.5', 'Volatile PM10', 'Volatile PM2.5']
+code_dict = {'PM<sub>10</sub>': 'PM10',
+             'Dir': 'WD',
+             'Speed': 'WS',
+             'Temp': 'TEMP',
+             'NO': 'NO',
+             'NO<sub>2</sub>': 'NO2',
+             'NO<sub>X</sub>asNO<sub>2</sub>': 'NOX',
+             'O<sub>3</sub>': 'OZONE',
+             'PM<sub>2.5</sub>': 'PM10'}
 
 def retrieve_data(monitoring_station, **options):
     url = "http://uk-air.defra.gov.uk/data/data_selector"        
@@ -37,25 +45,35 @@ def get_table(html):
 def get_rows(table):
     return table.findAll('tr')
 
-def get_fields(row):
-    fields = [field.contents[0] for field in row.findAll('td') if len(field.findAll('span')) == 0]
-    fields[1] = fields[1][:8]
-    return ', '.join(fields)
+def get_values(row):
+    values = [v.contents[0] for v in row.findAll('td') if len(v.findAll('span')) == 0]
+    values[1] = values[1][:8]
+    return values
 
-def scrape_UK(monitoring_station):
-    utcnow = datetime.datetime.utcnow()
-    fname = 'airquality_UK_' + monitoring_station + '_' + utcnow.strftime("%Y%m%d")
-    with open(fname, "w") as f:
-        output = []
-        output.append(', '.join(COLUMNS))
-        html = retrieve_data(monitoring_station)
+def get_column_heads(row):
+    return [''.join(map(str, td.contents)) for td in row.findAll('td') if td.contents[0] != 'Status/units']
+
+def scrape_UK():
+    stations = get_stations()
+    lat_long = get_lat_long(stations)
+    for station_code, station_name in stations:
+        if station_code in lat_long:
+            longitude, latitude, altitude = lat_long[station_code]
+            insert_station(station_code, longitude, latitude, altitude)
+        html = retrieve_data(station_code)
         table = get_table(html)
-        rows = get_rows(table)[2:]
-        for row in rows:
-            fields = get_fields(row)
-            output.append(fields)
-        f.writelines('\n'.join(output)+'\n')
+        rows = get_rows(table)
+        column_heads = get_column_heads(rows[1])
+        for row in rows[2:]:
+            values = get_values(row)
+            for attribute, value in zip(column_heads, values):
+                insert_pollution_data(station_code, attribute, value)
 
+def insert_pollution_data(station_code, attribute, value):
+    if (attribute in code_dict) and (value != 'No data') and (value != '&nbsp;'):
+        print "INSERT (%s, %s, %s)" % (station_code, code_dict[attribute], value)
+    
+    
 def get_stations():
     url = "http://uk-air.defra.gov.uk/data/data_selector?q=515239&s=s&o=s&l=1#mid"
     html = urllib2.urlopen(url)
@@ -69,11 +87,31 @@ def write_station_list():
     output += ["%s, %s" % t for t in get_stations()]
     with open("UK_station_list", "w") as f:
         f.writelines('\n'.join(output))
-    
+
+def get_lat_long(stations):
+    with open('AirBase_v8_stations.csv', 'rb') as csvfile:
+        reader = csv.reader(csvfile, delimiter='\t')
+        next(reader) # Skip header row
+        dic = {}
+        for row in reader:
+            station_european_code = row[0]
+            station_local_code = row[1]
+            country_iso_code = row[2]
+            longitude = row[12]
+            latitude = row[13]
+            altitude = row[14]
+            if country_iso_code == 'GB':
+                dic[station_local_code] = (longitude, latitude, altitude)
+        return dic
+
+def insert_station(station_code, longitude, latitude, altitude):
+    # print "Insert station: %s, %s, %s, %s" % (station_code, longitude, latitude, altitude)
+    pass
+
 if __name__ == "__main__":
-    stations = get_stations()
-    for station, name in stations:
-        scrape_UK(station)
+    scrape_UK()
+    print attributes
+        
 
 
 
