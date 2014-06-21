@@ -50,7 +50,7 @@ for f in files[0:]:
 		d         = d.split('|')
 		stationid = d[2]
 		system    = 1
-		thedate   = d[0] +' '+ d[1]
+		thedate   = d[0] +' '+ d[1] #TODO: What format is this?
 
 		param     = d[5]
 		if param in paramkeys:
