@@ -1,9 +1,10 @@
 #map-canvas {
 	width:  100%;
-	height: 50%;
+	height: 100%;
 }
 
 #vizview {
+	display:none;
 	width:  100%;
 	height: 50%;
 	top:    50%;
