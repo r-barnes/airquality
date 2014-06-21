@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="384.57162"
+   height="710"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="blue-google-map-pin.svg">
+  <metadata
+     id="metadata15">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>white google map pin</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs13" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="743"
+     id="namedview11"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="0.6440027"
+     inkscape:cx="148.01083"
+     inkscape:cy="343.28722"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2" />
+  <title
+     id="title4">white google map pin</title>
+  <path
+     style="fill:#ff00ff;fill-rule:evenodd;stroke:#000000;stroke-width:37;stroke-miterlimit:10;fill-opacity:1"
+     inkscape:connector-curvature="0"
+     id="svg_2"
+     clip-rule="evenodd"
+     stroke-miterlimit="10"
+     d="M 193.19688,627.83566 C 180.32197,559.68552 157.62312,502.96958 130.12895,450.40891 109.73509,411.42026 86.11033,375.43311 64.25105,337.62216 56.95439,325.00067 50.65672,311.66727 43.64515,298.56864 29.62516,272.3761 18.25807,242.00824 18.97978,202.61688 19.68583,164.12831 30.0084,133.25466 44.89384,108.01076 69.37696,66.49211 110.38536,32.45177 165.4098,23.50594 c 44.98856,-7.31425 87.1694,5.04305 117.0809,23.90367 24.44226,15.41298 43.37226,36.00052 57.75897,60.26426 15.0174,25.325 25.35962,55.24433 26.22583,94.26922 0.44532,19.99392 -2.59008,38.50952 -6.86779,53.86715 -4.32727,15.54566 -11.28858,28.54029 -17.48182,42.42151 -12.09198,27.09439 -27.24914,51.92121 -42.46289,76.76044 -45.31128,73.99087 -87.84082,149.44675 -106.46612,252.84347 z" />
+</svg>

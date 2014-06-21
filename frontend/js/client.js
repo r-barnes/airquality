@@ -18,6 +18,9 @@ var MapView = Backbone.View.extend({
   	var self=this;
   	this.stations = {};
 
+    self.default_marker_img  = 'img/blue-pin.png';
+    self.selected_marker_img = 'img/black-pin.png';
+
 		var map_options = {
 		  center:             new google.maps.LatLng(47.57, -122.31),
 		  zoom:               7,
@@ -83,16 +86,18 @@ var MapView = Backbone.View.extend({
 
     console.log('adding station', new_station)
 
+
+
     //Make a new marker
     var marker = new google.maps.Marker({
       position:    new google.maps.LatLng(new_station.lat, new_station.lon),
       map:         this.map,
       draggable:   false,
-      //icon:        icon.gicon,
+      icon:        self.default_marker_img,
       //animation: google.maps.Animation.DROP,
-      stationid:      new_station.stationid,
+      stationid:   new_station.stationid,
       zIndex:      1,
-      //visible:     !self.markers_hidden,
+      //visible:   !self.markers_hidden,
       //optimized: false
     });
 
@@ -116,7 +121,7 @@ var MapView = Backbone.View.extend({
     //Reset old marker to have its normal icon back
     if (this.selected_marker){
     	this.selected_marker.set("color","#ff0000");
-    	this.selected_marker.setIcon(new google.maps.MarkerImage("http://maps.google.com/mapfiles/ms/icons/red.png"));
+    	this.selected_marker.setIcon(self.default_marker_img);
       this.selected_marker.setOptions({zIndex:1});
       //this.selected_marker.setIcon( AppConfig.transit_mode_icons[this.selected_marker.stop_type].gicon );
     }
@@ -125,7 +130,7 @@ var MapView = Backbone.View.extend({
 
     //Set this marker to use its hover icon
     this.selected_marker=marker;
-    this.selected_marker.setIcon(new google.maps.MarkerImage("http://maps.google.com/mapfiles/ms/icons/blue.png"));
+    this.selected_marker.setIcon(self.selected_marker_img);
 
     vent.trigger("data", marker.stationid)
   },
@@ -140,7 +145,7 @@ var VizView = Backbone.View.extend({
   el: '#vizview',
 
   initialize: function(){
-  	this.listenTo(vent, "data", this.displayGraph, this);
+  	//this.listenTo(vent, "data", this.displayGraph, this);
 /*
 	  var dateline = svg.append('line')
 		                    .attr({
