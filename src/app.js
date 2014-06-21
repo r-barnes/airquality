@@ -1,6 +1,6 @@
 var express    = require('express');
 var routes     = require('./routes');
-var background = require('./background/updaters');
+//var background = require('./background/updaters');
 
 var app = express();
 
