@@ -16,6 +16,38 @@ CREATE TABLE measurements (
 
 GRANT ALL PRIVILEGES ON TABLE measurements TO airq;
 
+
+CREATE TABLE params (
+	paramID SMALLINT,
+	definition CHARACTER(9),
+	UNIQUE(paramID)
+);
+
+GRANT ALL PRIVILEGES ON TABLE params TO airq;
+
+INSERT INTO params (paramID, definition) VALUES
+(1, 'OZONE'),
+(2, 'PM10'),
+(3, 'PM2.5'),
+(4, 'TEMP'),
+(5, 'BARPR'),
+(6, 'SO2'),
+(7, 'RHUM'),
+(8, 'WS'),
+(9, 'WD'),
+(10, 'CO'),
+(11, 'NOY'),
+(12, 'NO2Y'),
+(13, 'NO'),
+(14, 'NOX'),
+(15, 'NO2'),
+(16, 'PRECIP'),
+(17, 'SRAD'),
+(18, 'BC'),
+(19, 'EC'),
+(20, 'OC');
+
+
 DROP TABLE stations;
 CREATE TABLE stations (
 	stationid CHARACTER(9),

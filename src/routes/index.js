@@ -1,65 +1,43 @@
-var elasticsearch = require('elasticsearch');
-var redis         = require("redis");
 var request       = require('request');
-
-var redisclient = redis.createClient();
-
-var esClient = new elasticsearch.Client({
-  apiVersion: '0.90' //,log: 'trace'
-});
-
-
-
-
-
 var pg = require('pg');
-var conString = "postgres://airq:nach0s@localhost/airquality";
 
-pg.connect(conString, function(err, client, done) {
+var conString = "postgres://airq:nach0s@localhost:3333/airquality";
+
+var client = new pg.Client(conString);
+
+client.connect(function(err){
   if(err) {
     return console.error('error fetching client from pool', err);
   }
-  client.query('SELECT $1::int AS number', ['1'], function(err, result) {
-    //call `done()` to release the client back to the pool
-    done();
+});
+
+
+client.query('SELECT $1::int AS number', ['1'], function(err, result) {
 
     if(err) {
       return console.error('error running query', err);
     }
     console.log(result.rows[0].number);
     //output: 1
-  });
 });
-
-
-
-
-
-
-
-
 
 exports.station = function(req, res) {
   var station = req.params.station;
+  var limit = req.params.limit;
+};
 
-  redisclient.get('aqs-'+station,
-    function(err, reply) {
-      if(err){
-        console.error("Error fetching station '"+station+"': "+err);
-        deferred.resolve(false);
-        return;
-      } else if (reply) {
-        deferred.resolve(JSON.parse(reply));
-        return;
-      } else {
-        self._fetchRealtime().then(function(result){
-          redisclient.set   (self.rediskey, JSON.stringify(result));
-          redisclient.expire(self.rediskey, 50); //TODO(Richard): Make sure this is set to a value specific for the transit provider
-          deferred.resolve( result );
-        });
-      }
+exports.last = function(req, res) {
+  var limit = req.params.limit;
+
+  client.query('SELECT stationid, system, datetime, definition,' +
+    'value FROM measurements,params WHERE param=paramID  limit $1::INT', [limit], function(err, result) {
+
+    if(err) {
+      return console.error('error running query', err);
     }
-  );
+    console.log(result);
+  });
+
 };
 
 exports.stations = function(req, res) {
@@ -67,38 +45,4 @@ exports.stations = function(req, res) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-
-  var filter = {
-    'geo_distance': {
-      //'distance': '10mi',
-      'location': [req.query.lon, req.query.lat]
-    }
-  };
-  var query = {
-    match_all : {}
-  };
-
-  esClient.search({
-    index: 'aqs_stations',
-    body: {
-      query: query,
-      filter: filter,
-      sort: [
-        {
-          '_geo_distance': {
-            'location': [req.query.lon, req.query.lat],
-            'unit': 'mi'
-          }
-        }
-      ]
-    }
-  }).then(function(resp) {
-    // We got a good response, let's format it for api use.
-    console.log(resp);
-    res.json( "hi" );
-  }, function(err) {
-    // There was an error. Return unprocessable 401.  Will want to revist this.
-    res.writeHead(401);
-    res.end();
-  });
 };
