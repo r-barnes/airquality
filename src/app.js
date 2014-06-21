@@ -14,8 +14,14 @@ app.use(allowCrossDomain);
 app.use(app.router);
 
 app.listen(process.env.PORT || 4730);
-app.get('/v0/station/:station', routes.station  );
-app.get('/v0/stations/:lat/:lon',         routes.stations );
+
+app.get('/v0/measurements/:stationId',   routes.measurements  );
+
+app.get('/v0/stationList',         routes.stationList );
+app.get('/v0/stationNear/:lat/:lon',         routes.stationNear );
+
+//app.get('/v0/station/:station', routes.station  );
+
 app.get('/v0/last/:limit',      routes.last );
 
 process.on('uncaughtException', function (error) {
