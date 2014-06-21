@@ -3,21 +3,19 @@ var routes     = require('./routes');
 var express = require('express');
 var app     = express();
 
+
+var allowCrossDomain = function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type,      Accept");
+  next();
+};
+
+app.use(allowCrossDomain);
+app.use(app.router);
+
 app.listen(process.env.PORT || 4730);
-
-// Listen for any options request
-app.options("*", function (req, res) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-
-  // Finish preflight request.
-  res.writeHead(204);
-  res.end();
-});
-
 app.get('/v0/station/:station', routes.station  );
-app.get('/v0/stations',         routes.stations );
+app.get('/v0/stations/:lat/:lon',         routes.stations );
 app.get('/v0/last/:limit',      routes.last );
 
 process.on('uncaughtException', function (error) {

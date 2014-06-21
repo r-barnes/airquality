@@ -17,6 +17,11 @@ United Kingdom
 All stations: http://uk-air.defra.gov.uk/common/map_data?c=d7af3b2b3f29ebbf0c6a7f742a8ff02d3eb60a4a
 Data for a particular station: http://uk-air.defra.gov.uk/data/site-data?f_site_id=PRES&view=last_hour
 
+http://uk-air.defra.gov.uk/data/
+http://www.openair-project.org/
+
+London: http://api.erg.kcl.ac.uk/AirQuality/help
+
 Germany
 --------------
 MAP:   http://www.umweltbundesamt.de/en/data/current-concentrations-of-air-pollutants-in-germany

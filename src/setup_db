@@ -56,7 +56,7 @@ CREATE TABLE stations (
 	lat 			REAL,
 	lon       REAL,
 	elev      REAL,
-  pt 				GEOGRAPHY(POINT,4326),
+  pt 				POINT,
   UNIQUE(stationid)
 );
 

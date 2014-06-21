@@ -2,8 +2,8 @@ var vent = {}; // or App.vent depending how you want to do this
 _.extend(vent, Backbone.Events);
 
 var AppConfig = {
-	station_url: 'http://localhost:3001/stations/:lat/:lon',
-	bounds_url:  'http://localhost:3001/bounds/:north/:south/:east/:west'
+	station_url: 'http://localhost:4730/v0/stations/:lat/:lon',
+	bounds_url:  'http://localhost:4730/bounds/:north/:south/:east/:west'
 };
 
 var MapView = Backbone.View.extend({
@@ -31,19 +31,15 @@ var MapView = Backbone.View.extend({
 		this.map = new google.maps.Map(document.getElementById("map-canvas"), map_options);
 
 		//idle event fires once when the user stops panning/zooming
-		//google.maps.event.addListener( this.map, "idle", this.mapBoundsChanged.bind(this) );
+		google.maps.event.addListener( this.map, "idle", this.mapBoundsChanged.bind(this) );
 
-		for(var i in stations){
-			this.addStation(stations[i]);
-		}
+    //this.spiderfy = new OverlappingMarkerSpiderfier(this.map, {keepSpiderfied:true, nearbyDistance:10});
 
-    /*this.spiderfy = new OverlappingMarkerSpiderfier(this.map, {keepSpiderfied:true, nearbyDistance:10});
-
-    this.spiderfy.addListener('click', function(marker, event) {
-      self.markerClicked(marker);
-    });*/
+    //this.spiderfy.addListener('click', function(marker, event) {
+    //  self.markerClicked(marker);
+    //});
   },
-/*
+
   mapBoundsChanged: function(){
     var bounds  = this.map.getBounds();
     var mcenter = this.map.getCenter();
@@ -53,23 +49,21 @@ var MapView = Backbone.View.extend({
     var boundsobj = {n:ne.lat(),s:sw.lat(),e:ne.lng(),w:sw.lng(), centerLat: mcenter.lat(), centerLng: mcenter.lng() };
     var self      = this;
 
-    console.log('changed');
-
-    return;
-
     //Get locations of stops which are visible
     var station_url = AppConfig.station_url
+                        .replace(':lat', mcenter.lat())
+                        .replace(':lon', mcenter.lng())
     										.replace(':north', ne.lat())
-    										.replace(':south', sw.lon())
-    										.replace(':east', ne.lon())
-    										.replace(':west', sw.lon());
+    										.replace(':south', sw.lat())
+    										.replace(':east', ne.lng())
+    										.replace(':west', sw.lng());
     $.get(station_url, {}, function(data, textStatus, jqXHR) {
-	    for(var j=0, len=data.stops.length; j<len; j++) {
-	      self.addStation(data.stops[j]);
+	    for(var j=0, len=data.length; j<len; j++) {
+	      self.addStation(data[j]);
 	    }
     });
   },
-*/
+
   addStation: function(new_station) {
     var self = this;
 
@@ -87,14 +81,16 @@ var MapView = Backbone.View.extend({
       return; //Yes, it already has a marker. Don't make another!
     }
 
+    console.log('adding station', new_station)
+
     //Make a new marker
     var marker = new google.maps.Marker({
-      position:    new google.maps.LatLng(new_station.lat,new_station.lon),
+      position:    new google.maps.LatLng(new_station.lat, new_station.lon),
       map:         this.map,
       draggable:   false,
       //icon:        icon.gicon,
       //animation: google.maps.Animation.DROP,
-      stationid:      new_station.id,
+      stationid:      new_station.stationid,
       zIndex:      1,
       //visible:     !self.markers_hidden,
       //optimized: false
@@ -105,10 +101,6 @@ var MapView = Backbone.View.extend({
 		google.maps.event.addListener(marker, 'click', function() {
 		 	self.markerClicked(marker);
 		});
-
-//    if (!this.views[new_stop.id]) {
-  //    this.views[new_stop.id] = new Omg.Views.Realtime({ stop: new_stop, map_stop:true });
-    //}
 
     //if(look_up) //Already present in stops array
     //  this.stops[look_up].marker = marker;
@@ -141,7 +133,7 @@ var MapView = Backbone.View.extend({
 });
 
 
-var testseries=[{date:"05/21/14 16:00", measurement:49}, {date:"05/21/14 17:00", measurement:50}, {date:"05/21/14 18:00", measurement:54}, {date:"05/21/14 19:00", measurement:53}, {date:"05/21/14 20:00", measurement:52}, {date:"05/21/14 21:00", measurement:51}, {date:"05/21/14 22:00", measurement:49}, {date:"05/21/14 23:00", measurement:48}, {date:"05/22/14 00:00", measurement:46}, {date:"05/22/14 01:00", measurement:42}, {date:"05/22/14 02:00", measurement:40}, {date:"05/22/14 03:00", measurement:41}, {date:"05/22/14 04:00", measurement:43}, {date:"05/22/14 05:00", measurement:41}, {date:"05/22/14 06:00", measurement:42}, {date:"05/22/14 07:00", measurement:46}, {date:"05/22/14 13:00", measurement:49}, {date:"05/22/14 14:00", measurement:55}, {date:"05/22/14 15:00", measurement:56}, {date:"05/22/14 16:00", measurement:50}, {date:"05/22/14 17:00", measurement:55}, {date:"05/22/14 18:00", measurement:53}, {date:"05/22/14 19:00", measurement:56}, {date:"05/22/14 20:00", measurement:59}, {date:"05/22/14 21:00", measurement:62}, {date:"05/22/14 22:00", measurement:66}, {date:"05/22/14 23:00", measurement:64}, {date:"05/23/14 00:00", measurement:57}, {date:"05/23/14 01:00", measurement:53}, {date:"05/23/14 02:00", measurement:48}, {date:"05/23/14 03:00", measurement:46}, {date:"05/23/14 04:00", measurement:46}, {date:"05/23/14 05:00", measurement:45}, {date:"05/23/14 06:00", measurement:44}, {date:"05/23/14 07:00", measurement:39}, {date:"05/23/14 08:00", measurement:31}, {date:"05/23/14 09:00", measurement:15}, {date:"05/23/14 10:00", measurement:12}, {date:"05/23/14 11:00", measurement:28}, {date:"05/23/14 12:00", measurement:41}, {date:"05/23/14 13:00", measurement:49}, {date:"05/23/14 14:00", measurement:49}, {date:"05/23/14 15:00", measurement:49}, {date:"05/23/14 16:00", measurement:52}, {date:"05/23/14 17:00", measurement:51}, {date:"05/23/14 18:00", measurement:50}, {date:"05/23/14 19:00", measurement:50}, {date:"05/23/14 20:00", measurement:49}, {date:"05/23/14 21:00", measurement:51}, {date:"05/23/14 22:00", measurement:54}, {date:"05/23/14 23:00", measurement:52}, {date:"05/24/14 00:00", measurement:48}, {date:"05/24/14 01:00", measurement:43}, {date:"05/24/14 02:00", measurement:35}, {date:"05/24/14 03:00", measurement:32}, {date:"05/24/14 04:00", measurement:31}, {date:"05/24/14 05:00", measurement:33}, {date:"05/24/14 06:00", measurement:36}, {date:"05/24/14 07:00", measurement:38}, {date:"05/24/14 08:00", measurement:37}, {date:"05/24/14 09:00", measurement:37}, {date:"05/24/14 10:00", measurement:35}, {date:"05/24/14 11:00", measurement:34}, {date:"05/24/14 12:00", measurement:36}, {date:"05/24/14 13:00", measurement:38}, {date:"05/24/14 14:00", measurement:39}, {date:"05/24/14 15:00", measurement:41}, {date:"05/24/14 16:00", measurement:41}, {date:"05/24/14 17:00", measurement:42}, {date:"05/24/14 18:00", measurement:43}, {date:"05/24/14 19:00", measurement:44}, {date:"05/24/14 20:00", measurement:46}, {date:"05/24/14 21:00", measurement:48}, {date:"05/24/14 22:00", measurement:49}, {date:"05/24/14 23:00", measurement:49}, {date:"05/25/14 00:00", measurement:50}, {date:"05/25/14 01:00", measurement:45}, {date:"05/25/14 02:00", measurement:39}, {date:"05/25/14 03:00", measurement:41}, {date:"05/25/14 04:00", measurement:35}, {date:"05/25/14 05:00", measurement:36}, {date:"05/25/14 06:00", measurement:24}, {date:"05/25/14 07:00", measurement:15}, {date:"05/25/14 08:00", measurement:10}, {date:"05/25/14 09:00", measurement:7}, {date:"05/25/14 10:00", measurement:7}, {date:"05/25/14 11:00", measurement:9}, {date:"05/25/14 12:00", measurement:20}, {date:"05/25/14 13:00", measurement:42}, {date:"05/25/14 14:00", measurement:48}, {date:"05/25/14 15:00", measurement:51}, {date:"05/25/14 16:00", measurement:54}, {date:"05/25/14 17:00", measurement:55}, {date:"05/25/14 18:00", measurement:53}, {date:"05/25/14 19:00", measurement:53}, {date:"05/25/14 20:00", measurement:53}, {date:"05/25/14 21:00", measurement:52}, {date:"05/25/14 22:00", measurement:54}, {date:"05/25/14 23:00", measurement:55}, {date:"05/26/14 00:00", measurement:56}, {date:"05/26/14 01:00", measurement:42}, {date:"05/26/14 02:00", measurement:35}, {date:"05/26/14 03:00", measurement:27}, {date:"05/26/14 04:00", measurement:23}, {date:"05/26/14 05:00", measurement:17}, {date:"05/26/14 06:00", measurement:13}, {date:"05/26/14 07:00", measurement:13}, {date:"05/26/14 08:00", measurement:10}, {date:"05/26/14 09:00", measurement:8}, {date:"05/26/14 10:00", measurement:8}, {date:"05/26/14 11:00", measurement:8}, {date:"05/26/14 12:00", measurement:27}, {date:"05/26/14 13:00", measurement:48}, {date:"05/26/14 14:00", measurement:57}, {date:"05/26/14 15:00", measurement:63}, {date:"05/26/14 16:00", measurement:64}, {date:"05/26/14 17:00", measurement:61}, {date:"05/26/14 18:00", measurement:59}, {date:"05/26/14 19:00", measurement:58}, {date:"05/26/14 20:00", measurement:62}, {date:"05/26/14 21:00", measurement:66}, {date:"05/26/14 22:00", measurement:68}, {date:"05/26/14 23:00", measurement:67}, {date:"05/27/14 00:00", measurement:63}, {date:"05/27/14 01:00", measurement:58}, {date:"05/27/14 02:00", measurement:53}, {date:"05/27/14 03:00", measurement:47}, {date:"05/27/14 04:00", measurement:46}, {date:"05/27/14 05:00", measurement:49}, {date:"05/27/14 06:00", measurement:51}, {date:"05/27/14 07:00", measurement:48}, {date:"05/27/14 08:00", measurement:47}, {date:"05/27/14 09:00", measurement:45}, {date:"05/27/14 10:00", measurement:43}, {date:"05/27/14 11:00", measurement:42}, {date:"05/27/14 12:00", measurement:46}, {date:"05/27/14 13:00", measurement:47}, {date:"05/27/14 14:00", measurement:49}, {date:"05/27/14 15:00", measurement:56}, {date:"05/27/14 16:00", measurement:62}, {date:"05/27/14 17:00", measurement:62}, {date:"05/27/14 18:00", measurement:60}, {date:"05/27/14 19:00", measurement:60}, {date:"05/27/14 20:00", measurement:49}, {date:"05/27/14 21:00", measurement:43}, {date:"05/27/14 22:00", measurement:35}, {date:"05/27/14 23:00", measurement:35}, {date:"05/28/14 00:00", measurement:38}, {date:"05/28/14 01:00", measurement:37}, {date:"05/28/14 02:00", measurement:39}, {date:"05/28/14 03:00", measurement:42}, {date:"05/28/14 04:00", measurement:38}, {date:"05/28/14 05:00", measurement:35}, {date:"05/28/14 06:00", measurement:35}, {date:"05/28/14 07:00", measurement:31}, {date:"05/28/14 08:00", measurement:33}, {date:"05/28/14 09:00", measurement:35}, {date:"05/28/14 10:00", measurement:36}, {date:"05/28/14 11:00", measurement:34}, {date:"05/28/14 12:00", measurement:35}, {date:"05/28/14 13:00", measurement:37}, {date:"05/28/14 14:00", measurement:42}, {date:"05/28/14 15:00", measurement:50}, {date:"05/28/14 16:00", measurement:52}, {date:"05/28/14 18:00", measurement:51}, {date:"05/28/14 19:00", measurement:46}, {date:"05/28/14 20:00", measurement:43}, {date:"05/28/14 21:00", measurement:42}, {date:"05/28/14 22:00", measurement:41}, {date:"05/28/14 23:00", measurement:39}, {date:"05/29/14 00:00", measurement:37}, {date:"05/29/14 01:00", measurement:33}, {date:"05/29/14 02:00", measurement:29}, {date:"05/29/14 03:00", measurement:32}, {date:"05/29/14 04:00", measurement:31}, {date:"05/29/14 05:00", measurement:27}, {date:"05/29/14 06:00", measurement:19}, {date:"05/29/14 07:00", measurement:24}, {date:"05/29/14 08:00", measurement:21}, {date:"05/29/14 09:00", measurement:14}, {date:"05/29/14 10:00", measurement:12}, {date:"05/29/14 11:00", measurement:11}];
+//var testseries=[{date:"05/21/14 16:00", measurement:49}, {date:"05/21/14 17:00", measurement:50}, {date:"05/21/14 18:00", measurement:54}, {date:"05/21/14 19:00", measurement:53}, {date:"05/21/14 20:00", measurement:52}, {date:"05/21/14 21:00", measurement:51}, {date:"05/21/14 22:00", measurement:49}, {date:"05/21/14 23:00", measurement:48}, {date:"05/22/14 00:00", measurement:46}, {date:"05/22/14 01:00", measurement:42}, {date:"05/22/14 02:00", measurement:40}, {date:"05/22/14 03:00", measurement:41}, {date:"05/22/14 04:00", measurement:43}, {date:"05/22/14 05:00", measurement:41}, {date:"05/22/14 06:00", measurement:42}, {date:"05/22/14 07:00", measurement:46}, {date:"05/22/14 13:00", measurement:49}, {date:"05/22/14 14:00", measurement:55}, {date:"05/22/14 15:00", measurement:56}, {date:"05/22/14 16:00", measurement:50}, {date:"05/22/14 17:00", measurement:55}, {date:"05/22/14 18:00", measurement:53}, {date:"05/22/14 19:00", measurement:56}, {date:"05/22/14 20:00", measurement:59}, {date:"05/22/14 21:00", measurement:62}, {date:"05/22/14 22:00", measurement:66}, {date:"05/22/14 23:00", measurement:64}, {date:"05/23/14 00:00", measurement:57}, {date:"05/23/14 01:00", measurement:53}, {date:"05/23/14 02:00", measurement:48}, {date:"05/23/14 03:00", measurement:46}, {date:"05/23/14 04:00", measurement:46}, {date:"05/23/14 05:00", measurement:45}, {date:"05/23/14 06:00", measurement:44}, {date:"05/23/14 07:00", measurement:39}, {date:"05/23/14 08:00", measurement:31}, {date:"05/23/14 09:00", measurement:15}, {date:"05/23/14 10:00", measurement:12}, {date:"05/23/14 11:00", measurement:28}, {date:"05/23/14 12:00", measurement:41}, {date:"05/23/14 13:00", measurement:49}, {date:"05/23/14 14:00", measurement:49}, {date:"05/23/14 15:00", measurement:49}, {date:"05/23/14 16:00", measurement:52}, {date:"05/23/14 17:00", measurement:51}, {date:"05/23/14 18:00", measurement:50}, {date:"05/23/14 19:00", measurement:50}, {date:"05/23/14 20:00", measurement:49}, {date:"05/23/14 21:00", measurement:51}, {date:"05/23/14 22:00", measurement:54}, {date:"05/23/14 23:00", measurement:52}, {date:"05/24/14 00:00", measurement:48}, {date:"05/24/14 01:00", measurement:43}, {date:"05/24/14 02:00", measurement:35}, {date:"05/24/14 03:00", measurement:32}, {date:"05/24/14 04:00", measurement:31}, {date:"05/24/14 05:00", measurement:33}, {date:"05/24/14 06:00", measurement:36}, {date:"05/24/14 07:00", measurement:38}, {date:"05/24/14 08:00", measurement:37}, {date:"05/24/14 09:00", measurement:37}, {date:"05/24/14 10:00", measurement:35}, {date:"05/24/14 11:00", measurement:34}, {date:"05/24/14 12:00", measurement:36}, {date:"05/24/14 13:00", measurement:38}, {date:"05/24/14 14:00", measurement:39}, {date:"05/24/14 15:00", measurement:41}, {date:"05/24/14 16:00", measurement:41}, {date:"05/24/14 17:00", measurement:42}, {date:"05/24/14 18:00", measurement:43}, {date:"05/24/14 19:00", measurement:44}, {date:"05/24/14 20:00", measurement:46}, {date:"05/24/14 21:00", measurement:48}, {date:"05/24/14 22:00", measurement:49}, {date:"05/24/14 23:00", measurement:49}, {date:"05/25/14 00:00", measurement:50}, {date:"05/25/14 01:00", measurement:45}, {date:"05/25/14 02:00", measurement:39}, {date:"05/25/14 03:00", measurement:41}, {date:"05/25/14 04:00", measurement:35}, {date:"05/25/14 05:00", measurement:36}, {date:"05/25/14 06:00", measurement:24}, {date:"05/25/14 07:00", measurement:15}, {date:"05/25/14 08:00", measurement:10}, {date:"05/25/14 09:00", measurement:7}, {date:"05/25/14 10:00", measurement:7}, {date:"05/25/14 11:00", measurement:9}, {date:"05/25/14 12:00", measurement:20}, {date:"05/25/14 13:00", measurement:42}, {date:"05/25/14 14:00", measurement:48}, {date:"05/25/14 15:00", measurement:51}, {date:"05/25/14 16:00", measurement:54}, {date:"05/25/14 17:00", measurement:55}, {date:"05/25/14 18:00", measurement:53}, {date:"05/25/14 19:00", measurement:53}, {date:"05/25/14 20:00", measurement:53}, {date:"05/25/14 21:00", measurement:52}, {date:"05/25/14 22:00", measurement:54}, {date:"05/25/14 23:00", measurement:55}, {date:"05/26/14 00:00", measurement:56}, {date:"05/26/14 01:00", measurement:42}, {date:"05/26/14 02:00", measurement:35}, {date:"05/26/14 03:00", measurement:27}, {date:"05/26/14 04:00", measurement:23}, {date:"05/26/14 05:00", measurement:17}, {date:"05/26/14 06:00", measurement:13}, {date:"05/26/14 07:00", measurement:13}, {date:"05/26/14 08:00", measurement:10}, {date:"05/26/14 09:00", measurement:8}, {date:"05/26/14 10:00", measurement:8}, {date:"05/26/14 11:00", measurement:8}, {date:"05/26/14 12:00", measurement:27}, {date:"05/26/14 13:00", measurement:48}, {date:"05/26/14 14:00", measurement:57}, {date:"05/26/14 15:00", measurement:63}, {date:"05/26/14 16:00", measurement:64}, {date:"05/26/14 17:00", measurement:61}, {date:"05/26/14 18:00", measurement:59}, {date:"05/26/14 19:00", measurement:58}, {date:"05/26/14 20:00", measurement:62}, {date:"05/26/14 21:00", measurement:66}, {date:"05/26/14 22:00", measurement:68}, {date:"05/26/14 23:00", measurement:67}, {date:"05/27/14 00:00", measurement:63}, {date:"05/27/14 01:00", measurement:58}, {date:"05/27/14 02:00", measurement:53}, {date:"05/27/14 03:00", measurement:47}, {date:"05/27/14 04:00", measurement:46}, {date:"05/27/14 05:00", measurement:49}, {date:"05/27/14 06:00", measurement:51}, {date:"05/27/14 07:00", measurement:48}, {date:"05/27/14 08:00", measurement:47}, {date:"05/27/14 09:00", measurement:45}, {date:"05/27/14 10:00", measurement:43}, {date:"05/27/14 11:00", measurement:42}, {date:"05/27/14 12:00", measurement:46}, {date:"05/27/14 13:00", measurement:47}, {date:"05/27/14 14:00", measurement:49}, {date:"05/27/14 15:00", measurement:56}, {date:"05/27/14 16:00", measurement:62}, {date:"05/27/14 17:00", measurement:62}, {date:"05/27/14 18:00", measurement:60}, {date:"05/27/14 19:00", measurement:60}, {date:"05/27/14 20:00", measurement:49}, {date:"05/27/14 21:00", measurement:43}, {date:"05/27/14 22:00", measurement:35}, {date:"05/27/14 23:00", measurement:35}, {date:"05/28/14 00:00", measurement:38}, {date:"05/28/14 01:00", measurement:37}, {date:"05/28/14 02:00", measurement:39}, {date:"05/28/14 03:00", measurement:42}, {date:"05/28/14 04:00", measurement:38}, {date:"05/28/14 05:00", measurement:35}, {date:"05/28/14 06:00", measurement:35}, {date:"05/28/14 07:00", measurement:31}, {date:"05/28/14 08:00", measurement:33}, {date:"05/28/14 09:00", measurement:35}, {date:"05/28/14 10:00", measurement:36}, {date:"05/28/14 11:00", measurement:34}, {date:"05/28/14 12:00", measurement:35}, {date:"05/28/14 13:00", measurement:37}, {date:"05/28/14 14:00", measurement:42}, {date:"05/28/14 15:00", measurement:50}, {date:"05/28/14 16:00", measurement:52}, {date:"05/28/14 18:00", measurement:51}, {date:"05/28/14 19:00", measurement:46}, {date:"05/28/14 20:00", measurement:43}, {date:"05/28/14 21:00", measurement:42}, {date:"05/28/14 22:00", measurement:41}, {date:"05/28/14 23:00", measurement:39}, {date:"05/29/14 00:00", measurement:37}, {date:"05/29/14 01:00", measurement:33}, {date:"05/29/14 02:00", measurement:29}, {date:"05/29/14 03:00", measurement:32}, {date:"05/29/14 04:00", measurement:31}, {date:"05/29/14 05:00", measurement:27}, {date:"05/29/14 06:00", measurement:19}, {date:"05/29/14 07:00", measurement:24}, {date:"05/29/14 08:00", measurement:21}, {date:"05/29/14 09:00", measurement:14}, {date:"05/29/14 10:00", measurement:12}, {date:"05/29/14 11:00", measurement:11}];
 
 
 var VizView = Backbone.View.extend({

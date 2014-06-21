@@ -12,6 +12,7 @@ client.connect(function(err){
 });
 
 
+/*
 client.query('SELECT $1::int AS number', ['1'], function(err, result) {
 
     if(err) {
@@ -19,7 +20,7 @@ client.query('SELECT $1::int AS number', ['1'], function(err, result) {
     }
     console.log(result.rows[0].number);
     //output: 1
-});
+});*/
 
 exports.station = function(req, res) {
   var station = req.params.station;
@@ -42,7 +43,15 @@ exports.last = function(req, res) {
 
 exports.stations = function(req, res) {
   // Add CORS headers
-  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Origin',  '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+
+  client.query("SELECT * FROM stations ORDER BY pt <-> POINT("+req.params.lon+','+req.params.lat+") limit 10;", [], function(err, result) {
+    if(err) {
+      return console.error('error running query', err);
+    }
+
+    res.json(result.rows);
+  });
 };
