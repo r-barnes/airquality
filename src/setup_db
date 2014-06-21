@@ -46,3 +46,20 @@ INSERT INTO params (paramID, definition) VALUES
 (18, 'BC'),
 (19, 'EC'),
 (20, 'OC');
+
+
+DROP TABLE stations;
+CREATE TABLE stations (
+	stationid CHARACTER(9),
+	system    SMALLINT,
+	name      VARCHAR(255),
+	lat 			REAL,
+	lon       REAL,
+	elev      REAL,
+  pt 				GEOGRAPHY(POINT,4326),
+  UNIQUE(stationid)
+);
+
+CREATE INDEX ptindx ON stations USING gist (pt);
+
+GRANT ALL PRIVILEGES ON TABLE stations TO airq;
