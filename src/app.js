@@ -1,24 +1,9 @@
-var express    = require('express');
 var routes     = require('./routes');
-//var background = require('./background/updaters');
 
-var app = express();
+var express = require('express');
+var app     = express();
 
-// all environments
-app.set('port', process.env.PORT || 3011);
-//app.set('views', path.join(__dirname, 'views'));
-//app.set('view engine', 'jade');
-//app.use(express.favicon());
-//app.use(express.logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded());
-app.use(express.methodOverride());
-app.use(express.compress());
-app.use(app.router);
-app.enable('trust proxy');
-//app.use(express.static(path.join(__dirname, 'public')));
-
-console.log('Server running on %s', app.get('port'));
+app.listen(process.env.PORT || 4730);
 
 // Listen for any options request
 app.options("*", function (req, res) {
@@ -31,7 +16,6 @@ app.options("*", function (req, res) {
   res.end();
 });
 
-//                      Index Route
 app.get('/v0/station/:station', routes.station  );
 app.get('/v0/stations',         routes.stations );
 app.get('/v0/last/:limit',      routes.last );
