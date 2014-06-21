@@ -24,8 +24,12 @@ API calls
 /measurements/stationID (optional limit)
 	Get a list of measurements taken from a specific station. Limits at 1000 if one is not specified
 
-/stations
+/stationList
 	Get a list of stations
+
+/stationNear/lat/long (optional limit)
+	Get a list of stations near a lat and long coordinate. Limits at 10 if none if specified
 
 /last/limit
 	Get a list of the last limit measurements
+
