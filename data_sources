@@ -1,0 +1,99 @@
+Misc
+==============
+WHO outdoor air pollution database: http://www.who.int/phe/health_topics/outdoorair/databases/en/
+
+Europe
+==============
+List of Air Quality stations: http://macc-raq.gmes-atmosphere.eu/ObsDataProviders.php
+
+Europe wide: http://www.eea.europa.eu/data-and-maps/data/airbase-the-european-air-quality-database-8
+http://www.airqualitynow.eu/about_home.php
+
+United Kingdom
+--------------
+All stations: http://uk-air.defra.gov.uk/common/map_data?c=d7af3b2b3f29ebbf0c6a7f742a8ff02d3eb60a4a
+Data for a particular station: http://uk-air.defra.gov.uk/data/site-data?f_site_id=PRES&view=last_hour
+
+
+
+China
+==============
+http://aqicn.org/city/beijing/
+
+
+
+United States
+==============
+
+Minnesota
+---------
+* State (easy): http://www.pca.state.mn.us/index.php/air/air-quality-and-pollutants/general-air-quality/air-quality-index/current-condition-details.html
+
+Montana (hardish)
+-----------------
+* State-wide: http://todaysair.mt.gov/
+
+New Mexico
+-----------------
+* State: http://drdasnm1.alink.com/
+
+Colorado (easy)
+----------
+* State-wide: http://www.colorado.gov/airquality/air_quality.aspx
+
+Idaho (easy)
+----------
+* State-wide: http://airquality.deq.idaho.gov/
+
+Oregon
+----------
+* State-wide: http://www.deq.state.or.us/aqi/index.aspx
+
+Washington
+----------
+* State-wide: https://fortress.wa.gov/ecy/enviwa/
+* Puget Sound: http://www.pscleanair.org/airq/network/stationdata.xml
+
+
+
+
+
+
+http://pollutionfree.wordpress.com/real-time-air-pollution-networks/
+
+
+
+
+
+Traffic
+=============================
+https://developer.mapquest.com/web/products/dev-services/traffic-ws
+http://www.inrix.com/
+http://www.dot.state.mn.us/traffic/data/
+
+Need
+=============================
+Distance-to-coast measurement
+Impervious surface
+Tree canopy
+Population density
+See refs 29-31
+See 32-34
+See 35
+See www.geos-chem.org
+
+
+Road Networks
+===================
+United State Census (Tiger) road networks.
+Major roads, minor roads, total.
+
+NO2 Satellite
+===================
+http://www.temis.nl/airpollution/no2col/no2regioomi_v2.php
+
+
+Possible URLS
+=============
+howstheair.com
+airstatus.org
