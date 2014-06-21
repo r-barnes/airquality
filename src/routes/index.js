@@ -12,8 +12,7 @@ client.connect(function(err){
   }
 });
 
-
-
+//get a list of measurements, needs a specific station ID
 exports.measurements = function(req, res) {
   var station = req.params.stationId;
   var querySpec = url.parse(req.url, true).query;
@@ -29,6 +28,7 @@ exports.measurements = function(req, res) {
   });
 };
 
+//get the last x amount of measurements from all stations
 exports.last = function(req, res) {
   var limit = req.params.limit;
   client.query('SELECT stationid, system, datetime, definition,' +
@@ -41,9 +41,8 @@ exports.last = function(req, res) {
   });
 };
 
+//get a list of all stations
 exports.stationList = function(req, res) {
-  var querySpec = url.parse(req.url, true).query;
-
   client.query('SELECT stationid, system, name, lat, lon, elev, pt FROM stations;', function(err, result) {
     if(err) {
       res.json(err);
@@ -53,6 +52,7 @@ exports.stationList = function(req, res) {
   });
 };
 
+//get a list of stations close to a specific longitude and latitude - with a limit
 exports.stationNear = function(req, res) {
   var querySpec = url.parse(req.url, true).query;
   var limit = querySpec.limit === undefined ? 10 : querySpec.limit;
