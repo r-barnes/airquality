@@ -14,7 +14,14 @@ United Kingdom
 All stations: http://uk-air.defra.gov.uk/common/map_data?c=d7af3b2b3f29ebbf0c6a7f742a8ff02d3eb60a4a
 Data for a particular station: http://uk-air.defra.gov.uk/data/site-data?f_site_id=PRES&view=last_hour
 
-
+Germany
+--------------
+MAP:   http://www.umweltbundesamt.de/en/data/current-concentrations-of-air-pollutants-in-germany
+PM10:  http://www.umweltbundesamt.de/en/luftdaten/stations/locations.csv?pollutant=PM1&data_type=1TMW&date=20140620&hour=15&statename=&state=
+CO:    http://www.umweltbundesamt.de/en/luftdaten/stations/locations.csv?pollutant=CO&data_type=8SMW&date=20140620&hour=15&statename=&state=
+Ozone: http://www.umweltbundesamt.de/en/luftdaten/stations/locations.csv?pollutant=O3&data_type=1SMW&date=20140620&hour=15&statename=&state=
+SO2:   http://www.umweltbundesamt.de/en/luftdaten/stations/locations.csv?pollutant=SO2&data_type=1SMW&date=20140620&hour=16&statename=&state=
+NO2:   http://www.umweltbundesamt.de/en/luftdaten/stations/locations.csv?pollutant=NO2&data_type=1SMW&date=20140620&hour=16&statename=&state=
 
 China
 ==============
