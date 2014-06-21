@@ -10,6 +10,12 @@ paramkeys = {'OZONE': 1, 'PM10': 2, 'PM2.5': 3, 'TEMP':4, 'BARPR': 5, 'SO2': 6, 
 
 class MeasureMonkey:
 	def __init__(self, system):
+		systems = {'airnow': 1}
+		if system in systems:
+			self.system = systems[system]
+		else:
+			raise Exception('Unrecognised system')
+
 		self.db    = psycopg2.connect(database='airquality', user='airq', password='nach0s', host='localhost')
 		self.db.set_isolation_level(0) #Set conneciton to autocommit
 
@@ -17,7 +23,6 @@ class MeasureMonkey:
 		self.meascursor.execute("PREPARE measurement_insert AS INSERT INTO measurements (stationid,	system,	datetime,	param, value) VALUES ($1, $2, $3, $4, $5)")
 
 		self.data_to_insert = set()
-		self.system = system
 
 	def insert(self, stationid, thedate, param, value):
 		datum = (stationid, self.system, thedate, param, value)
@@ -44,7 +49,7 @@ class AirNow:
 		pass
 
 	def loadData(self, command):
-		db = MeasureMonkey(1)
+		db = MeasureMonkey('airnow')
 
 		self._connectFTP()
 		self.ftp.cwd('HourlyData')
