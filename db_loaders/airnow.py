@@ -41,14 +41,14 @@ class StationMonkey(BaseMonkey):
 	def insert(self, stationid, name, lat, lon, elev):
 		lat=float(lat)
 		lon=float(lon)
-		if not (-180<=lat and lat<=180 and -90<=lon and lon<=90):
+		if not (-180<=lon and lon<=180 and -90<=lat and lat<=90):
 			return
 		datum = (stationid, self.system, name, lat, lon, elev)
 		self.data_to_insert.add(datum)
 
 	def commit(self):
 		super().commit(columns=('stationid','system','name','lat','lon','elev'))
-		self.dbcursor.execute("UPDATE stations SET pt = ST_GeomFromText('POINT(' || lat || ' ' || lon || ')',4326);")
+		self.dbcursor.execute("UPDATE stations SET pt = POINT(lon,lat);")
 
 class MeasureMonkey(BaseMonkey):
 	def __init__(self, system):
