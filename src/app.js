@@ -16,7 +16,7 @@ app.options("*", function (req, res) {
   res.end();
 });
 
-app.get('/v0/station/:station', routes.station  );
+app.get('/v0/measurements/:stationId',   routes.measurements  );
 app.get('/v0/stations',         routes.stations );
 app.get('/v0/last/:limit',      routes.last );
 

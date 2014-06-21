@@ -18,3 +18,14 @@ To connect from a remote machine setup an SSH tunnel:
 Then you can tap into the database like so:
 
     psql -h localhost -p 3333 airquality airq
+
+
+API calls
+/measurements/stationID (optional limit)
+	Get a list of measurements taken from a specific station. Limits at 1000 if one is not specified
+
+/stations
+	Get a list of stations
+
+/last/limit
+	Get a list of the last limit measurements
