@@ -9,3 +9,12 @@
    1. `sudo -u postgres createlang plpgsql omgtransit;`
    2. `sudo -u postgres psql -d omgtransit -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql`
    3. `sudo -u postgres psql -d omgtransit -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql`
+
+
+To connect from a remoet machine setup an SSH tunnel:
+
+    ssh -L 3333:localhost:5432 USER@107.170.182.238
+
+Then you can tap into the database like so:
+
+    psql -h localhost -p 3333 airquality airq
