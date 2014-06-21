@@ -8,7 +8,7 @@ import io
 
 paramkeys = {'OZONE': 1, 'PM10': 2, 'PM2.5': 3, 'TEMP':4, 'BARPR': 5, 'SO2': 6, 'RHUM': 7, 'WS': 8, 'WD': 9, 'CO': 10, 'NOY': 11, 'NO2Y': 12, 'NO': 13, 'NOX': 14, 'NO2': 15, 'PRECIP': 16, 'SRAD': 17, 'BC': 18, 'EC': 19, 'OC': 20}
 
-class MeasureMonkey:
+class BaseMonkey:
 	def __init__(self, system):
 		systems = {'airnow': 1}
 		if system in systems:
@@ -18,23 +18,35 @@ class MeasureMonkey:
 
 		self.db    = psycopg2.connect(database='airquality', user='airq', password='nach0s', host='localhost')
 		self.db.set_isolation_level(0) #Set conneciton to autocommit
-
-		self.meascursor = self.db.cursor()
-		self.meascursor.execute("PREPARE measurement_insert AS INSERT INTO measurements (stationid,	system,	datetime,	param, value) VALUES ($1, $2, $3, $4, $5)")
+		self.dbcursor = self.db.cursor()
 
 		self.data_to_insert = set()
-
-	def insert(self, stationid, thedate, param, value):
-		datum = (stationid, self.system, thedate, param, value)
-		self.data_to_insert.add(datum)
 
 	def commit(self):
 		prepped_data = ["\t".join([str(y) for y in x]) for x in self.data_to_insert]
 		prepped_data = "\n".join(prepped_data)
 		prepped_data = io.StringIO(prepped_data)
 		prepped_data.seek(0)
-		self.meascursor.copy_from(prepped_data, 'measurements')
+		self.dbcursor.copy_from(prepped_data, self.table)
 		self.data_to_insert = set()
+
+class StationMonkey(BaseMonkey):
+	def __init__(self, system):
+		super().__init__(system)
+		self.table = 'stations'
+
+	def insert(self, stationid, name, lat, lon, elev):
+		datum = (stationid, self.system, name, lat, lon, elev)
+		self.data_to_insert.add(datum)
+
+class MeasureMonkey(BaseMonkey):
+	def __init__(self, system):
+		super().__init__(system)
+		self.table = 'measurements'
+
+	def insert(self, stationid, thedate, param, value):
+		datum = (stationid, self.system, thedate, param, value)
+		self.data_to_insert.add(datum)
 
 
 class AirNow:
@@ -45,8 +57,28 @@ class AirNow:
 		print("Connecting via FTP...")
 		self.ftp = ftplib.FTP(host='ftp.airnowapi.org', user='leapingleopard', passwd='xi7MxOiwrRR_vKeT')
 
-	def loadStations(self):
-		pass
+	def loadStations(self, command):
+		db = StationMonkey('airnow')
+
+		self._connectFTP()
+		self.ftp.cwd('Locations')
+
+		print("Retrieving stations list")
+		data = []
+		self.ftp.retrlines('RETR monitoring_site_locations.dat', data.append)
+
+		#CSV fields are: AQSID|parameter name|site code|site name|status|agency id|agency name|EPA region|latitude|longitude|elevation|GMT offset|country code|CMSA code|CMSA name|MSA code|MSA name|state code|state name|county code|county name|city code|city name
+		for line in data:
+			line = line.split('|')
+
+			stationid = line[0]
+			name      = line[3]
+			lat       = line[8]
+			lon       = line[9]
+			elev      = line[10]
+			db.insert(stationid,name,lat,lon,elev)
+
+		db.commit()
 
 	def loadData(self, command):
 		db = MeasureMonkey('airnow')
