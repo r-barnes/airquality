@@ -25,27 +25,28 @@ CREATE TABLE params (
 
 GRANT ALL PRIVILEGES ON TABLE params TO airq;
 
-INSERT INTO params (paramID, definition) VALUES
-(1, 'OZONE'),
-(2, 'PM10'),
-(3, 'PM2.5'),
-(4, 'TEMP'),
-(5, 'BARPR'),
-(6, 'SO2'),
-(7, 'RHUM'),
-(8, 'WS'),
-(9, 'WD'),
-(10, 'CO'),
-(11, 'NOY'),
-(12, 'NO2Y'),
-(13, 'NO'),
-(14, 'NOX'),
-(15, 'NO2'),
-(16, 'PRECIP'),
-(17, 'SRAD'),
-(18, 'BC'),
-(19, 'EC'),
-(20, 'OC');
+DROP TABLE params;
+INSERT INTO params (paramID, definition, natStandard, caStandard, standardUnit, avgHours) VALUES
+(1, 'OZONE', 0.075, 0.07, 'ppm', 8),
+(2, 'PM10', 150, 50, 'microgramspcubicmeter', 24),
+(3, 'PM2.5', null, 35, 'microgramspcubicmeter', 24),
+(4, 'TEMP', null, null, 'F', null),
+(5, 'BARPR', null, null, null, null),
+(6, 'SO2', 0.14, 0.04, 'microgramspcubicmeter', 24),
+(7, 'RHUM', null, null, null, null),
+(8, 'WS', null, null, null, null),
+(9, 'WD', null, null, null, null),
+(10, 'CO', 9, 9, 'ppm', 8),
+(11, 'NOY', null, null, null, null),
+(12, 'NO2Y', null, null, null, null),
+(13, 'NO', null, null, null, null),
+(14, 'NOX', null, null, null, null),
+(15, 'NO2', 0.1, 0.18, 'ppm', 1),
+(16, 'PRECIP', null, null, null, null),
+(17, 'SRAD', null, null, null, null),
+(18, 'BC', null, null, null, null),
+(19, 'EC', null, null, null, null),
+(20, 'OC', null, null, null, null);
 
 
 DROP TABLE stations;
