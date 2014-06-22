@@ -68,19 +68,24 @@ exports.stationList = function(req, res) {
   });
 };
 
-//get a list of stations close to a specific longitude and latitude - with a limit
-exports.stationNear = function(req, res) {
-  var querySpec = url.parse(req.url, true).query;
-  var limit = querySpec.limit === undefined ? 10 : querySpec.limit;
-
-  client.query("SELECT * FROM stations ORDER BY pt <-> POINT("+req.params.lon+','+req.params.lat+") LIMIT $1::INT;", [limit], function(err, result) {
+function StationNear(lat, lon, limit){
+  client.query("SELECT * FROM stations ORDER BY pt <-> POINT("+lon+','+lat+") LIMIT $1::INT;", [limit], function(err, result) {
     if(err) {
       res.json(err);
       return console.error('error running query', err);
     }
 
-    res.json(result.rows);
+    return resultt.rows;
   });
+}
+
+//get a list of stations close to a specific longitude and latitude - with a limit
+exports.stationNear = function(req, res) {
+  var querySpec = url.parse(req.url, true).query;
+  var limit = querySpec.limit === undefined ? 10 : querySpec.limit;
+
+  results=StationNear(req.params.lon, req.params.lat, limit);
+  res.json(results);
 };
 
 //send an SMS
@@ -94,6 +99,6 @@ exports.sms = function(req, res) {
  }
   res.writeHead(200, {'Content-Type': 'text/html' });
   res.end("Thanks!");
-  
+
 }
 
