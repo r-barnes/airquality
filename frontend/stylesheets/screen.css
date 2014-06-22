@@ -115,6 +115,13 @@ nav .navbutton a:hover {
 }
 
 /* line 53, ../sass/screen.scss */
+main {
+  top: 66px;
+  position: fixed;
+  width: 100%;
+}
+
+/* line 59, ../sass/screen.scss */
 #vizview {
   -webkit-transition-property: bottom;
   -moz-transition-property: bottom;
@@ -140,7 +147,7 @@ nav .navbutton a:hover {
   border-top-left-radius: 50px;
   border-top-right-radius: 50px;
 }
-/* line 69, ../sass/screen.scss */
+/* line 75, ../sass/screen.scss */
 #vizview .close {
   text-decoration: none;
   font-weight: bold;
@@ -154,17 +161,17 @@ nav .navbutton a:hover {
   padding: 0;
 }
 
-/* line 83, ../sass/screen.scss */
+/* line 89, ../sass/screen.scss */
 #vizview.active {
   bottom: 0px;
 }
 
-/* line 88, ../sass/screen.scss */
+/* line 94, ../sass/screen.scss */
 #about h1 {
   font-family: sans-serif;
   text-align: center;
 }
-/* line 93, ../sass/screen.scss */
+/* line 99, ../sass/screen.scss */
 #about .centralcol {
   background-color: #efefef;
   width: 100%;
@@ -172,14 +179,14 @@ nav .navbutton a:hover {
   margin: 0 auto;
   height: 100%;
 }
-/* line 100, ../sass/screen.scss */
+/* line 106, ../sass/screen.scss */
 #about .centralcol img {
   border-radius: 100px;
   margin-bottom: 10px;
   width: 200px;
   height: 200px;
 }
-/* line 107, ../sass/screen.scss */
+/* line 113, ../sass/screen.scss */
 #about .centralcol .pic {
   margin-left: 33.3px;
   width: 200px;
