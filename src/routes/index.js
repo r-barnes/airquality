@@ -75,7 +75,7 @@ function StationNear(lat, lon, limit){
       return console.error('error running query', err);
     }
 
-    return resultt.rows;
+    return result.rows;
   });
 }
 
