@@ -2,7 +2,7 @@ var vent = {}; // or App.vent depending how you want to do this
 _.extend(vent, Backbone.Events);
 
 var AppConfig = {
-	station_url: 'http://localhost:4730/v0/stationNear/:lat/:lon?limit=5',
+	station_url: 'http://localhost:4730/v0/stationNear/:lat/:lon?limit=20',
   masurements_url: 'http://localhost:4730/v0/measurements/:stationid',
 	bounds_url:  'http://localhost:4730/bounds/:north/:south/:east/:west'
 };
@@ -16,8 +16,8 @@ var MapView = Backbone.View.extend({
   },
 
   initialize: function(){
-    var self=this;
-    this.stations = {};
+    var self = this;
+    self.stations = {};
 
     self.default_marker_img  = 'img/blue-pin.png';
     self.selected_marker_img = 'img/black-pin.png';
@@ -37,11 +37,28 @@ var MapView = Backbone.View.extend({
 		//idle event fires once when the user stops panning/zooming
 		google.maps.event.addListener( this.map, "idle", this.mapBoundsChanged.bind(this) );
 
+    self.getGeolocation();
     //this.spiderfy = new OverlappingMarkerSpiderfier(this.map, {keepSpiderfied:true, nearbyDistance:10});
 
     //this.spiderfy.addListener('click', function(marker, event) {
     //  self.markerClicked(marker);
     //});
+  },
+
+  getGeolocation: function(){
+    var self=this;
+
+    if(!navigator.geolocation)
+      return;
+
+    navigator.geolocation.getCurrentPosition(function(pos){
+      self.centerMap(pos.coords.latitude,pos.coords.longitude);
+    });
+  },
+
+  centerMap: function(lat,lon){
+    var new_center = new google.maps.LatLng(lat, lon);
+    this.map.setCenter(new_center);
   },
 
   mapBoundsChanged: function(){
@@ -72,22 +89,8 @@ var MapView = Backbone.View.extend({
     var self = this;
 
     //Search stops array to see if an object for this stop is already present
-    var look_up=false;
-    for(var i in this.stations){
-      if( this.stations[i].id == new_station.id ){
-        look_up=i;
-        break;
-      }
-    }
-
-    //Does a marker for this stop already exist on the map?
-    if(look_up!==false) {
-      return; //Yes, it already has a marker. Don't make another!
-    }
-
-    console.log('adding station', new_station);
-
-
+    if(typeof(this.stations[new_station.stationid])!=="undefined")
+      return;
 
     //Make a new marker
     var marker = new google.maps.Marker({
@@ -108,12 +111,8 @@ var MapView = Backbone.View.extend({
 		 	self.markerClicked(marker);
 		});
 
-    //if(look_up) //Already present in stops array
-    //  this.stops[look_up].marker = marker;
-    //else {  //The stop is not in the array, so add it
-      new_station.marker = marker;
-      //this.stations.push(new_station);
-    //}
+    new_station.marker                   = marker;
+    this.stations[new_station.stationid] = marker;
   },
 
   markerClicked: function(marker) {
@@ -143,8 +142,14 @@ var MapView = Backbone.View.extend({
 var VizView = Backbone.View.extend({
   el: '#vizview',
 
+  events: {
+    "click .close":  "hide",
+  },
+
   initialize: function(){
   	this.listenTo(vent, "data", this.displayGraph, this);
+    this.listenTo(vent, "vizview:show", this.show, this);
+    this.listenTo(vent, "vizview:hide", this.hide, this);
 /*
 	  var dateline = svg.append('line')
 		                    .attr({
@@ -157,15 +162,20 @@ var VizView = Backbone.View.extend({
 		                    .attr('class', 'verticalLine');*/
   },
 
+  show: function(){
+    console.log('Showing vizview');
+    this.$el.addClass('active');
+  },
+
+  hide: function(){
+    this.$el.removeClass('active');
+  },
+
   displayGraph: function(station){
     var measurement_data = AppConfig.masurements_url.replace(':stationid', station);
-    
+
     $.get(measurement_data, {}, function(data, textStatus, jqXHR) {
       console.log(data);
-
-      d3.select("#vizWindow").attr({
-        style: "display: block;"
-      });
 
 
     });

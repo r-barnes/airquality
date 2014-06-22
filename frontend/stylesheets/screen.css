@@ -67,13 +67,13 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
   display: block;
 }
 
-/* line 8, ../sass/screen.scss */
+/* line 9, ../sass/screen.scss */
 html, body {
   padding: 0;
   margin: 0;
 }
 
-/* line 13, ../sass/screen.scss */
+/* line 14, ../sass/screen.scss */
 #map-canvas {
   width: 100%;
   height: 100%;
@@ -82,7 +82,7 @@ html, body {
   position: fixed;
 }
 
-/* line 21, ../sass/screen.scss */
+/* line 22, ../sass/screen.scss */
 nav {
   width: 100%;
   background-color: black;
@@ -92,7 +92,6 @@ nav {
   left: 0;
   text-align: center;
 }
-
 /* line 31, ../sass/screen.scss */
 nav .navbutton {
   width: 100px;
@@ -105,37 +104,74 @@ nav .navbutton {
   font-size: 20pt;
   font-weight: bold;
 }
-
-/* line 43, ../sass/screen.scss */
+/* line 42, ../sass/screen.scss */
 nav .navbutton a {
   text-decoration: none;
   color: white;
 }
-
-/* line 48, ../sass/screen.scss */
+/* line 47, ../sass/screen.scss */
 nav .navbutton a:hover {
   color: blue;
 }
 
-/* line 52, ../sass/screen.scss */
-#vizWindow {
-  display: none;
-  position: absolute;
-  width: 300px;
-  height: 300px;
-  top: 30%;
-  left: 30%;
-  z-index: 10;
-  background-color: #fff;
+/* line 53, ../sass/screen.scss */
+main {
+  top: 66px;
+  position: fixed;
+  width: 100%;
 }
 
-/* line 63, ../sass/screen.scss */
+/* line 59, ../sass/screen.scss */
+#vizview {
+  -webkit-transition-property: bottom;
+  -moz-transition-property: bottom;
+  -o-transition-property: bottom;
+  transition-property: bottom;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+  position: fixed;
+  width: 100%;
+  max-width: 500px;
+  height: 300px;
+  left: 50%;
+  margin-left: -250px;
+  bottom: -300px;
+  z-index: 10;
+  background-color: #fff;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+}
+/* line 75, ../sass/screen.scss */
+#vizview .close {
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 40px;
+  color: black;
+  font-style: sans-serif;
+  right: 10px;
+  top: 10px;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+}
+
+/* line 89, ../sass/screen.scss */
+#vizview.active {
+  bottom: 0px;
+}
+
+/* line 94, ../sass/screen.scss */
 #about h1 {
   font-family: sans-serif;
   text-align: center;
 }
-
-/* line 68, ../sass/screen.scss */
+/* line 99, ../sass/screen.scss */
 #about .centralcol {
   background-color: #efefef;
   width: 100%;
@@ -143,16 +179,14 @@ nav .navbutton a:hover {
   margin: 0 auto;
   height: 100%;
 }
-
-/* line 76, ../sass/screen.scss */
+/* line 106, ../sass/screen.scss */
 #about .centralcol img {
   border-radius: 100px;
   margin-bottom: 10px;
   width: 200px;
   height: 200px;
 }
-
-/* line 83, ../sass/screen.scss */
+/* line 113, ../sass/screen.scss */
 #about .centralcol .pic {
   margin-left: 33.3px;
   width: 200px;
