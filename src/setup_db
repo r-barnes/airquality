@@ -70,7 +70,7 @@ DROP TABLE zips;
 CREATE TABLE zips (
 	zip      CHARACTER(5),
 	city     VARCHAR(255),
-	state    CHAR(2)
+	state    CHAR(2),
 	lat      FLOAT,
 	lon      FLOAT,
 	timezone INT,
