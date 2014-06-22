@@ -127,8 +127,6 @@ var MapView = Backbone.View.extend({
       //this.selected_marker.setIcon( AppConfig.transit_mode_icons[this.selected_marker.stop_type].gicon );
     }
 
-    console.log('Made it here');
-
     //Set this marker to use its hover icon
     this.selected_marker=marker;
     this.selected_marker.setIcon(self.selected_marker_img);
@@ -160,12 +158,16 @@ var VizView = Backbone.View.extend({
   },
 
   displayGraph: function(station){
-    console.log(station);
-
     var measurement_data = AppConfig.masurements_url.replace(':stationid', station);
     
     $.get(measurement_data, {}, function(data, textStatus, jqXHR) {
       console.log(data);
+
+      d3.select("#vizWindow").attr({
+        style: "display: block;"
+      });
+
+
     });
 
   	/*var datavar=[];
@@ -211,3 +213,9 @@ var AppRouter = Backbone.Router.extend({
 
 var MapView = new MapView();
 var vizview = new VizView();
+
+function closeWindow(){
+  d3.select("#vizview").attr({
+    style: "display: none"
+  });
+}
