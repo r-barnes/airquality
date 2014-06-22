@@ -129,10 +129,19 @@ function getMessage(res, stationid) {
   LastMeas(stationid).then(function(last_measurement) {
     // console.log('End LastMeas');
     // console.log('last_measurement = ', last_measurement);
-    var answer = JSON.stringify(last_measurement);
-    console.log('answer = ', answer);
-    xmlResponse(res, JSON.stringify(last_measurement));
+    result = MeasToText(last_measurement);
+    xmlResponse(res, result);
   });
+}
+
+function MeasToText(meas) {
+  var result = meas.date+"   ";
+  for (var i=0;i<meas.meas.length;i++) {
+       line = meas.meas[i].name.replace(/ /g, '') + '=' + meas.meas[i].val + ", ";
+       console.log(line);
+       result += line;
+  }
+  return result;
 }
 
 //get a list of stations close to a specific longitude and latitude - with a limit
