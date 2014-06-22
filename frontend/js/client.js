@@ -143,9 +143,14 @@ var MapView = Backbone.View.extend({
 var VizView = Backbone.View.extend({
   el: '#vizview',
 
+  events: {
+    "click .close":  "hide",
+  },
+
   initialize: function(){
   	this.listenTo(vent, "data", this.displayGraph, this);
     this.listenTo(vent, "vizview:show", this.show, this);
+    this.listenTo(vent, "vizview:hide", this.hide, this);
 /*
 	  var dateline = svg.append('line')
 		                    .attr({
