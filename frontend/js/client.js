@@ -2,7 +2,7 @@ var vent = {}; // or App.vent depending how you want to do this
 _.extend(vent, Backbone.Events);
 
 var AppConfig = {
-	station_url: 'http://localhost:4730/v0/stations/:lat/:lon',
+	station_url: 'http://localhost:4730/v0/stationNear/:lat/:lon?limit=300',
 	bounds_url:  'http://localhost:4730/bounds/:north/:south/:east/:west'
 };
 
@@ -145,7 +145,7 @@ var VizView = Backbone.View.extend({
   el: '#vizview',
 
   initialize: function(){
-  	//this.listenTo(vent, "data", this.displayGraph, this);
+  	this.listenTo(vent, "data", this.displayGraph, this);
 /*
 	  var dateline = svg.append('line')
 		                    .attr({
