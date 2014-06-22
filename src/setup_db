@@ -68,8 +68,13 @@ GRANT ALL PRIVILEGES ON TABLE stations TO airq;
 
 DROP TABLE zips;
 CREATE TABLE zips (
-	zip CHARACTER(5),
-	json VARCHAR(1024)
+	zip      CHARACTER(5),
+	city     VARCHAR(255),
+	state    CHAR(2)
+	lat      FLOAT,
+	lon      FLOAT,
+	timezone INT,
+	dst      INT,
   UNIQUE(zip)
 );
 

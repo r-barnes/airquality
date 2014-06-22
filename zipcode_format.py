@@ -13,12 +13,11 @@ input_file = csv.DictReader(open("zipcode.csv"))
 
 prepped_data = ""
 for row in input_file:
-  row['latitude']  = float(row['latitude'])
-  row['longitude'] = float(row['longitude'])
+  row['latitude']  = float()
+  row['longitude'] = float()
   row['timezone']  = int(row['timezone'])
 
-  jdump         = json.dumps(row, ensure_ascii=False)
-  prepped_data += row['zip']+"\t"+jdump+"\n"
+  prepped_data += ("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (row['zip'], row['city'], row['state'], row['latitude'], row['longitude'], row['timezone'], row['dst']))
 
 prepped_data = io.StringIO(prepped_data)
 prepped_data.seek(0)
