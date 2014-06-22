@@ -37,11 +37,28 @@ var MapView = Backbone.View.extend({
 		//idle event fires once when the user stops panning/zooming
 		google.maps.event.addListener( this.map, "idle", this.mapBoundsChanged.bind(this) );
 
+    self.getGeolocation();
     //this.spiderfy = new OverlappingMarkerSpiderfier(this.map, {keepSpiderfied:true, nearbyDistance:10});
 
     //this.spiderfy.addListener('click', function(marker, event) {
     //  self.markerClicked(marker);
     //});
+  },
+
+  getGeolocation: function(){
+    var self=this;
+
+    if(!navigator.geolocation)
+      return;
+
+    navigator.geolocation.getCurrentPosition(function(pos){
+      self.centerMap(pos.coords.latitude,pos.coords.longitude);
+    });
+  },
+
+  centerMap: function(lat,lon){
+    var new_center = new google.maps.LatLng(lat, lon);
+    this.map.setCenter(new_center);
   },
 
   mapBoundsChanged: function(){
