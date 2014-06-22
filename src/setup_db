@@ -64,3 +64,13 @@ CREATE TABLE stations (
 CREATE INDEX ptindx ON stations USING gist (pt);
 
 GRANT ALL PRIVILEGES ON TABLE stations TO airq;
+
+
+DROP TABLE zips;
+CREATE TABLE zips (
+	zip CHARACTER(5),
+	json VARCHAR(1024)
+  UNIQUE(zip)
+);
+
+GRANT ALL PRIVILEGES ON TABLE zips TO airq;
