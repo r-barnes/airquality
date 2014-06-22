@@ -6,14 +6,14 @@ import psycopg2
 import sys
 import io
 import urllib
-import urllib2
-from BeautifulSoup import BeautifulSoup
+import urllib3
+from bs4 import BeautifulSoup
 import csv
 paramkeys = {'OZONE': 1, 'PM10': 2, 'PM2.5': 3, 'TEMP':4, 'BARPR': 5, 'SO2': 6, 'RHUM': 7, 'WS': 8, 'WD': 9, 'CO': 10, 'NOY': 11, 'NO2Y': 12, 'NO': 13, 'NOX': 14, 'NO2': 15, 'PRECIP': 16, 'SRAD': 17, 'BC': 18, 'EC': 19, 'OC': 20}
 
 class BaseMonkey:
     def __init__(self, system):
-        systems = {'airnow': 1, 'ukair', 2}
+        systems = {'airnow': 1, 'ukair': 2}
         if system in systems:
             self.system = systems[system]
         else:
@@ -143,15 +143,18 @@ class AirNow:
 
 class UKAir(AirNow):
     def __init__(self):
-        self.stations = self.loadStations()
+        pass
             
     def loadStations(self, command):
         db = StationMonkey('ukair')
 
         print("Retrieving stations list")
+        
         # Scrape stations list from uk-air.defra.gov.uk
         url = "http://uk-air.defra.gov.uk/data/data_selector?q=515239&s=s&o=s&l=1#mid"
-        html = urllib2.urlopen(url)
+        http = urllib3.PoolManager()
+        r = http.request('GET', url)
+        html = r.data.decode('unicode_escape')
         soup = BeautifulSoup(html)
         select = soup.findAll('select')[0]
         stations = [(str(option['value']), str(option.contents[0]))
