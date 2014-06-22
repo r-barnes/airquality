@@ -1,6 +1,7 @@
 var request = require('request');
-var pg = require('pg');
-var url = require('url');
+var pg      = require('pg');
+var url     = require('url');
+var Q       = require('q');
 
 var conString = "postgres://airq:nach0s@localhost:3333/airquality";
 
@@ -69,13 +70,37 @@ exports.stationList = function(req, res) {
 };
 
 function StationNear(lat, lon, limit){
+  var deferred = Q.defer();
   client.query("SELECT * FROM stations ORDER BY pt <-> POINT("+lon+','+lat+") LIMIT $1::INT;", [limit], function(err, result) {
     if(err) {
       res.json(err);
       return console.error('error running query', err);
     }
-    
-    return result.rows;
+
+    deferred.resolve(result.rows);
+  });
+
+  return deferred.promise;
+}
+
+function xmlResponse(res, message) {
+  
+  xml = '<?xml version="1.0" encoding="UTF-8"?><Response>' +
+        '<Message>' + message + '</Message></Response>';
+
+  res.writeHead(200, {'Content-Type': 'text/html' });
+  console.log('Response: ', xml);
+  res.end(xml); 
+}
+
+function getMessage(res, stationid) {
+  console.log('Start LastMeas');
+  LastMeas(stationid).then(function(last_measurement) {
+    // console.log('End LastMeas');
+    // console.log('last_measurement = ', last_measurement);
+    var answer = JSON.stringify(last_measurement);
+    console.log('answer = ', answer);
+    xmlResponse(res, JSON.stringify(last_measurement));
   });
 }
 
@@ -84,8 +109,9 @@ exports.stationNear = function(req, res) {
   var querySpec = url.parse(req.url, true).query;
   var limit = querySpec.limit === undefined ? 10 : querySpec.limit;
 
-  results=StationNear(req.params.lon, req.params.lat, limit);
-  res.json(results);
+  StationNear(req.params.lat, req.params.lon, limit).then(function(result){
+    res.json(result);
+  });
 };
 
 //send an SMS
@@ -110,28 +136,23 @@ exports.sms = function(req, res) {
           lat = result.rows[0].lat;
           lon = result.rows[0].lon;
           console.log('lat ' + lat + ' lon ' + lon);
-          StationNear(lat, lon, 1).then(function(result){
-            console.log(nearest_station);
+          StationNear(lat, lon  , 1).then(function(nearest_station){
+            nearest_station = nearest_station[0];
             if (typeof(nearest_station) !== 'undefined') {
-              message = "The nearest station is " + nearest_station;
+              stationid = nearest_station.stationid;
+              console.log('stationid is', stationid);
+              getMessage(res, stationid);  
             } else {
-              message = "Nearest station not found.";
+              xmlResponse(res, "Nearest station not found.");
             }
-            console.log(message);
           });
         } else {
-          message = "zip code not found";
+          console.log("zip code ", zipcode, " not found");
         }   
       });
     } else {
-      message = zipcode + " is not a valid zip code"
+      console.log(zipcode, " is not a valid zip code");
     }
   }
-  
-  xml = '<?xml version="1.0" encoding="UTF-8"?><Response>' +
-        '<Message>' + message + "</Message></Response>"
-
-  res.writeHead(200, {'Content-Type': 'text/html' });
-  res.end(xml);
 }
 
