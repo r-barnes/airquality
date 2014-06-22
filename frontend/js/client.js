@@ -16,8 +16,8 @@ var MapView = Backbone.View.extend({
   },
 
   initialize: function(){
-    var self=this;
-    this.stations = {};
+    var self = this;
+    self.stations = {};
 
     self.default_marker_img  = 'img/blue-pin.png';
     self.selected_marker_img = 'img/black-pin.png';
@@ -89,22 +89,8 @@ var MapView = Backbone.View.extend({
     var self = this;
 
     //Search stops array to see if an object for this stop is already present
-    var look_up=false;
-    for(var i in this.stations){
-      if( this.stations[i].id == new_station.id ){
-        look_up=i;
-        break;
-      }
-    }
-
-    //Does a marker for this stop already exist on the map?
-    if(look_up!==false) {
-      return; //Yes, it already has a marker. Don't make another!
-    }
-
-    console.log('adding station', new_station);
-
-
+    if(typeof(this.stations[new_station.stationid])!=="undefined")
+      return;
 
     //Make a new marker
     var marker = new google.maps.Marker({
@@ -125,12 +111,8 @@ var MapView = Backbone.View.extend({
 		 	self.markerClicked(marker);
 		});
 
-    //if(look_up) //Already present in stops array
-    //  this.stops[look_up].marker = marker;
-    //else {  //The stop is not in the array, so add it
-      new_station.marker = marker;
-      //this.stations.push(new_station);
-    //}
+    new_station.marker                   = marker;
+    this.stations[new_station.stationid] = marker;
   },
 
   markerClicked: function(marker) {
