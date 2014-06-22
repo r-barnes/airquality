@@ -171,34 +171,100 @@ var VizView = Backbone.View.extend({
     this.$el.removeClass('active');
   },
 
-  displayGraph: function(station){
+    displayGraph: function(station){
     var measurement_data = AppConfig.masurements_url.replace(':stationid', station);
 
+    var chartAttr = {};
+    chartAttr.width = 400;
+    chartAttr.height = 200;
+    chartAttr.offsetX = 30;
+    chartAttr.offsetY = 50;
+
     $.get(measurement_data, {}, function(data, textStatus, jqXHR) {
-      console.log(data);
+      //console.log(data);
 
+      vent.trigger('vizview:show');
 
+      //remove the old svg and redraw it
+      d3.select("#vizSvg").remove();
+
+      var svg = d3.select("#vizview").append("svg").attr("id", "vizSvg");
+
+      svg.append("text").attr({
+        x: 30,
+        y: 40,
+        'font-size': 30,
+        'font-weight': 'bold',
+        'font-family': '\'Open Sans\', sans-serif'
+      }).classed('stationName', true).text(data.stationInfo.name);
+
+     // console.log(new Date(Date.parse(data.measurements[0].datetime)).getHours());
+
+      var dateRange = d3.extent(data.measurements, function(d){ return Date.parse(d.datetime);});
+      var nestedData = d3.nest().key(function(d) {return d.definition.trim();}).entries(data.measurements);
+
+      var x = d3.time.scale().domain(dateRange).rangeRound([0, chartAttr.width]);
+
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom')
+        .ticks(d3.time.days, 1)
+        .tickFormat(d3.time.format('%m/%d'))
+        .tickSize(0)
+        .tickPadding(8);
+
+      svg.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(' + chartAttr.offsetX + ', ' + (chartAttr.height + chartAttr.offsetY) + ')')
+        .call(xAxis)
+        .selectAll("text")  
+          .style("text-anchor", "end")
+          .attr("dx", "-.8em")
+          .attr("dy", ".15em")
+          .attr("transform", function(d) {
+              return "rotate(-65)" ;
+              });
+
+      var colorScale = d3.scale.linear().domain([0, nestedData.length]).range(["red", "blue"]);
+
+        for (var i = 0; i < nestedData.length; i++) {
+          //we're only going to chart the first dectected thing, keep charting the others in a loop later
+          var dataOfInt = nestedData[i].values;
+          var maxVal = d3.max(dataOfInt, function(d){return d.value;});
+          var y = d3.scale.linear().domain([0, maxVal]).range([0, chartAttr.height]);
+          console.log(dataOfInt);
+
+          var chartGrp = svg.append("g");
+
+          var line = d3.svg.line()
+              .x(function(d) { return x(Date.parse(d.datetime)); })
+              .y(function(d) { return chartAttr.height - y(d.value) + chartAttr.offsetY; });
+
+          chartGrp.append("path").datum(dataOfInt).attr("d", function(d){return line(d);})
+          .attr("fill", "none")
+          .attr("stroke-width", "1")
+          .attr("stroke", colorScale(i)); 
+        }
     });
+    /*var datavar=[];
+    var paramtypes=["OZONE","NO","NO2","NO2Y","NOX","NOY","OC","OZONE","PM10","PM2.5","RHUM","SO2"];
+    for(var i=0;i<paramtypes.length;i++){
+      var param=paramtypes[i];
+      if(typeof(data[station][param])==="undefined") continue;
+      var temp={};
+      temp.type         = "line";
+      temp.xValueType   = "dateTime";
+      temp.legendText   = param;
+      temp.showInLegend = true;
+      temp.dataPoints   = _.map(data[station][param],function(obj){return {x: moment(obj.date).unix()*1000, y: parseFloat(obj.value) }});
+      datavar.push(temp);
+    }
 
-  	/*var datavar=[];
-  	var paramtypes=["OZONE","NO","NO2","NO2Y","NOX","NOY","OC","OZONE","PM10","PM2.5","RHUM","SO2"];
-  	for(var i=0;i<paramtypes.length;i++){
-  		var param=paramtypes[i];
-  		if(typeof(data[station][param])==="undefined") continue;
-  		var temp={};
-  		temp.type         = "line";
-  		temp.xValueType   = "dateTime";
-  		temp.legendText   = param;
-  		temp.showInLegend = true;
-  		temp.dataPoints   = _.map(data[station][param],function(obj){return {x: moment(obj.date).unix()*1000, y: parseFloat(obj.value) }});
-  		datavar.push(temp);
-  	}
-
-  	console.log(datavar);
+    console.log(datavar);
 
     var chart = new CanvasJS.Chart("vizview",
     {
-    	zoomEnabled: true,
+      zoomEnabled: true,
       title:{
       text: stations[station].name
       },
