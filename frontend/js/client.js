@@ -2,9 +2,9 @@ var vent = {}; // or App.vent depending how you want to do this
 _.extend(vent, Backbone.Events);
 
 var AppConfig = {
-	station_url: 'http://localhost:4730/v0/stationNear/:lat/:lon?limit=20',
-  masurements_url: 'http://localhost:4730/v0/measurements/:stationid',
-	bounds_url:  'http://localhost:4730/bounds/:north/:south/:east/:west'
+	station_url: 'http://airstatus.info:4730/v0/stationNear/:lat/:lon?limit=20',
+  masurements_url: 'http://airstatus.info:4730/v0/measurements/:stationid',
+	bounds_url:  'http://airstatus.info:4730/bounds/:north/:south/:east/:west'
 };
 
 var MapView = Backbone.View.extend({
@@ -245,6 +245,22 @@ var VizView = Backbone.View.extend({
           .attr("stroke-width", "1")
           .attr("stroke", colorScale(i)); 
         }
+
+        var legend = svg.append("g").attr("transform", "translate(410, 60)");
+
+        legend.selectAll("rect").data(nestedData).enter().append("rect").attr({
+          x: 0,
+          y: function(d,i){return i * 50;},
+          height: 20,
+          width: 20,
+          fill: function(d,i){return colorScale(i);},
+        });
+
+        legend.selectAll("text").data(nestedData).enter().append("text").attr({
+          x: 25,
+          y: function(d,i){return (i * 50) + 18;},
+          fill: 'black',
+        }).text(function(d){console.log(d);return d.key;});
     });
     /*var datavar=[];
     var paramtypes=["OZONE","NO","NO2","NO2Y","NOX","NOY","OC","OZONE","PM10","PM2.5","RHUM","SO2"];
