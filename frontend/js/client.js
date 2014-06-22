@@ -179,6 +179,15 @@ var VizView = Backbone.View.extend({
     chartAttr.height = 200;
     chartAttr.offsetX = 30;
     chartAttr.offsetY = 50;
+    
+    d3.select("#vizSvg").remove();
+    var svg = d3.select("#vizview").append("svg").attr("id", "vizSvg");
+
+    svg.append("text")
+    .attr({
+        x: 30,
+        y: 40})
+    .text("Loading...").classed("loading", true);
 
     $.get(measurement_data, {}, function(data, textStatus, jqXHR) {
       //console.log(data);
@@ -186,9 +195,10 @@ var VizView = Backbone.View.extend({
       vent.trigger('vizview:show');
 
       //remove the old svg and redraw it
-      d3.select("#vizSvg").remove();
+      
+      d3.select("text.loading").remove();
 
-      var svg = d3.select("#vizview").append("svg").attr("id", "vizSvg");
+      
 
       svg.append("text").attr({
         x: 30,
@@ -197,6 +207,8 @@ var VizView = Backbone.View.extend({
         'font-weight': 'bold',
         'font-family': '\'Open Sans\', sans-serif'
       }).classed('stationName', true).text(data.stationInfo.name);
+
+      
 
      // console.log(new Date(Date.parse(data.measurements[0].datetime)).getHours());
 
