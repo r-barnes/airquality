@@ -1,16 +1,18 @@
-<html>
+<html lang="en">
 <head>
 	<title>Air Quality Map</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, minimal-ui" />
 	<link rel="stylesheet" type="text/css" href="stylesheets/screen.css" />
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="stylesheets/ui-lightness/jquery-ui-1.10.4.min.css" />
 </head>
 <body>
 	<nav>
 		<div class="navbutton" style="left:0"><a href="about.html">About</a></div>
 		<div class="navbutton" style="right:0"><a href="api.html">API</a></div>
-		<img src="img/air_quality_index_small.png">
+		<div class="navbutton" style="right:100"><a href="#" class="sms">SMS</a></div>
+		<a href="/"><img src="img/air_quality_index_small.png"></a>
 	</nav>
 	<div id="mapview">
 		<div id="map-canvas"></div>
@@ -21,7 +23,12 @@
 		<!--<svg id="vizSvg"></svg>-->
 	</div>
 
+	<div id="dialog" title="Basic dialog" style="display:none;width:500px;">
+  	<p style="text-align:center">Text your <b>zip code</b> to<br><span style="font-weight:bold;background-color:white;border-radius:5px;display:inline-block;font-size:40px;padding:10px;">443-201-AIRQ</span><br>to get the air status for your area!</p>
+	</div>
+
 	<script src="js/lib/jquery.min.js"></script>
+	<script src="js/lib/jquery-ui-1.10.4.min.js"></script>
 	<script src="js/lib/underscore.min.js"></script>
 	<script src="js/lib/backbone.min.js"></script>
 	<script src="js/lib/spiderfy.min.js"></script>

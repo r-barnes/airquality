@@ -50,6 +50,12 @@ nav {
   }
 }
 
+main {
+  top:      66px;
+  position: fixed;
+  width:    100%;
+}
+
 #vizview {
   @include transition-property(bottom);
   @include transition-duration(0.2s);
