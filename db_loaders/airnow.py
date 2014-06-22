@@ -11,6 +11,18 @@ from bs4 import BeautifulSoup
 import csv
 paramkeys = {'OZONE': 1, 'PM10': 2, 'PM2.5': 3, 'TEMP':4, 'BARPR': 5, 'SO2': 6, 'RHUM': 7, 'WS': 8, 'WD': 9, 'CO': 10, 'NOY': 11, 'NO2Y': 12, 'NO': 13, 'NOX': 14, 'NO2': 15, 'PRECIP': 16, 'SRAD': 17, 'BC': 18, 'EC': 19, 'OC': 20}
 
+def getsoup(url):
+    http = urllib3.PoolManager()
+    r = http.request('GET', url)
+    html = r.data.decode('unicode_escape')
+    soup = BeautifulSoup(html)
+    return soup
+
+#Example: timestamp('25/12/2014', '13:00:00') = '2014-12-25 13:00:00'
+def timestamp(date, time):
+    dd, mm, yy = date.split('/')
+    return "%s-%s-%s %s" % (yy, mm, dd, time)
+
 class BaseMonkey:
     def __init__(self, system):
         systems = {'airnow': 1, 'ukair': 2}
@@ -156,12 +168,13 @@ class UKAir(AirNow):
         r = http.request('GET', url)
         html = r.data.decode('unicode_escape')
         soup = BeautifulSoup(html)
+        soup = getsoup(url)
         select = soup.findAll('select')[0]
         stations = [(str(option['value']), str(option.contents[0]))
                     for option in select.findAll('option')]
 
         # Read latitude, longitude, elevation from AirBase      
-        with open('AirBase_v8_stations.csv', 'rb') as csvfile:
+        with open('AirBase_v8_stations.csv', 'rt') as csvfile:
             reader = csv.reader(csvfile, delimiter='\t')
             next(reader) # Skip header row
             dic = {}
@@ -181,15 +194,13 @@ class UKAir(AirNow):
                 lon = dic[stationid][0]
                 elev = dic[stationid][2]
                 db.insert(stationid,name,lat,lon,elev)
-                            
-    def getStations(self):
-        db = StationMonkey('ukair')
-        return db.fetchall()
+        db.commit()
             
     def loadData(self, command):
-            
+                
         def retrieve_data(stationid):
             url = "http://uk-air.defra.gov.uk/data/data_selector"
+            http = urllib3.PoolManager()
             params = {
                     'q': '515237',
                     'f_statistic_type_id': '9999',
@@ -198,17 +209,13 @@ class UKAir(AirNow):
                     'submit': 'Save selection',
                     'f_preset_date': '1',
                     'f_site_id[]': stationid}
-
-            data = urllib.urlencode(params)
-            results = urllib2.urlopen(url, data)
-            return results
+            r = http.request('GET', url, fields=params)
+            html = r.data.decode('unicode_escape')
+            return html
         
-        def get_table(html):
+        def get_rows(html):
             soup = BeautifulSoup(html)
             table = soup.findAll('table')[0]
-            return table
-
-        def get_rows(table):
             return table.findAll('tr')
 
         def get_values(row):
@@ -231,48 +238,59 @@ class UKAir(AirNow):
                      'NO<sub>2</sub>': 'NO2',
                      'NO<sub>X</sub>asNO<sub>2</sub>': 'NOX',
                      'O<sub>3</sub>': 'OZONE',
-                     'PM<sub>2.5</sub>': 'PM10'}
+                     'PM<sub>2.5</sub>': 'PM2.5'}
         
         def insert_row(stationid, thedate, param, value):
             if (param in code_dict) and (value != 'No data') and (value != '&nbsp;'):
-                db.insert(stationid, thedate, code_dict[param], value)
-                            
-        for stationid, name, lat, lon, elev in self.getStations():
-                html = retrieve_data(stationid)
-                rows = get_rows(get_table(html))
-                headers = get_column_heads(rows[1])
-                for row in rows[2:]:
-                        values = get_values(row)
-                        thedate = row[0] + ' ' + row[1]
-                        thedate = thedate.replace('/','-')
-                        for param, val in zip(headers, values):
-                            insert_row(stationid, thedate, param, value)
+                db2.insert(stationid, thedate, paramkeys[code_dict[param]], int(value))
+                print ("Insert (%s, %s, %s, %s)" % (stationid, thedate, code_dict[param], int(value)))
+
+        db = StationMonkey('ukair')
+        db2 = MeasureMonkey('ukair')
+        cursor = db.db.cursor()
+        cursor.execute("SELECT * from stations;")
+        rows = cursor.fetchall()
+        for row in rows:
+            print(row)
+            stationid = row[0]
+            lat = row[1]
+            lon = row[2]
+            elev = row[3]
+            html = retrieve_data(stationid)
+            rows = get_rows(html)
+            headers = get_column_heads(rows[1])
+            for row in rows[2:]:
+                values = get_values(row)
+                thedate = timestamp(values[0], values[1])
+                for param, val in zip(headers, values):
+                    insert_row(stationid, thedate, param, val)
+        db2.commit()
 
 
 if len(sys.argv)==1:
-        print("Syntax: %s <API NAME> <COMMAND>" % (sys.argv[0]))
-        print("\nAPIS:")
-        print("\tairnow dataload <FILE>")
-        print("\tairnow dataload latestonline")
-        print("\tairnow dataload bulkonline")
-        print("\tairnow stationload <FILE>")
-        print("\tairnow stationload online")
-        sys.exit(-1)
+    print("Syntax: %s <API NAME> <COMMAND>" % (sys.argv[0]))
+    print("\nAPIS:")
+    print("\tairnow dataload <FILE>")
+    print("\tairnow dataload latestonline")
+    print("\tairnow dataload bulkonline")
+    print("\tairnow stationload <FILE>")
+    print("\tairnow stationload online")
+    sys.exit(-1)
 
 apis = {'airnow': AirNow,
         'ukair': UKAir}
 
 
 if not sys.argv[1] in apis:
-        print("API not found")
-        sys.exit(-1)
+    print("API not found")
+    sys.exit(-1)
 else:
-        api = apis[sys.argv[1]]()
-        if len(sys.argv)!=4:
-                raise Exception('Need a command and argument')
-        elif sys.argv[2]=='dataload':
-                api.loadData(sys.argv[3])
-        elif sys.argv[2]=='stationload':
-                api.loadStations(sys.argv[3])
-        else:
-                raise Exception('Unrecognised command')
+    api = apis[sys.argv[1]]()
+    if len(sys.argv)!=4:
+        raise Exception('Need a command and argument')
+    elif sys.argv[2]=='dataload':
+        api.loadData(sys.argv[3])
+    elif sys.argv[2]=='stationload':
+        api.loadStations(sys.argv[3])
+    else:
+        raise Exception('Unrecognised command')
