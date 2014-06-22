@@ -9,14 +9,18 @@ import urllib
 import urllib3
 from bs4 import BeautifulSoup
 import csv
+import re
+
 paramkeys = {'OZONE': 1, 'PM10': 2, 'PM2.5': 3, 'TEMP':4, 'BARPR': 5, 'SO2': 6, 'RHUM': 7, 'WS': 8, 'WD': 9, 'CO': 10, 'NOY': 11, 'NO2Y': 12, 'NO': 13, 'NOX': 14, 'NO2': 15, 'PRECIP': 16, 'SRAD': 17, 'BC': 18, 'EC': 19, 'OC': 20}
 
-def getsoup(url):
+def get_html(url, fields = None):
     http = urllib3.PoolManager()
-    r = http.request('GET', url)
+    if fields:
+        r = http.request('GET', url, fields)
+    else:
+        r = http.request('GET', url)
     html = r.data.decode('unicode_escape')
-    soup = BeautifulSoup(html)
-    return soup
+    return html
 
 #Example: timestamp('25/12/2014', '13:00:00') = '2014-12-25 13:00:00'
 def timestamp(date, time):
@@ -164,15 +168,15 @@ class UKAir(AirNow):
         
         # Scrape stations list from uk-air.defra.gov.uk
         url = "http://uk-air.defra.gov.uk/data/data_selector?q=515239&s=s&o=s&l=1#mid"
-        http = urllib3.PoolManager()
-        r = http.request('GET', url)
-        html = r.data.decode('unicode_escape')
+        html = get_html(url)
         soup = BeautifulSoup(html)
-        soup = getsoup(url)
         select = soup.findAll('select')[0]
-        stations = [(str(option['value']), str(option.contents[0]))
-                    for option in select.findAll('option')]
-
+        stations = {}
+        for option in select.findAll('option'):
+            code = str(option['value'])
+            name = str(''.join(option.contents))
+            stations[code] = name
+        
         # Read latitude, longitude, elevation from AirBase      
         with open('AirBase_v8_stations.csv', 'rt') as csvfile:
             reader = csv.reader(csvfile, delimiter='\t')
@@ -181,42 +185,61 @@ class UKAir(AirNow):
             for row in reader:
                 country_iso_code = row[2]
                 if country_iso_code == 'GB':
-                    station_local_code = row[1]
+                    code = row[1]
+                    name = row[4]
                     longitude = float(row[12])
                     latitude = float(row[13])
                     altitude = float(row[14])
-                    dic[station_local_code] = (longitude, latitude, altitude)
+                    dic[code] = (longitude, latitude, altitude)
+                    if not (code in stations):
+                        stations[code] = name
                     
         # Insert stations
-        for stationid, name in stations:
-            if stationid in dic:
-                lat = dic[stationid][1]
-                lon = dic[stationid][0]
-                elev = dic[stationid][2]
-                db.insert(stationid,name,lat,lon,elev)
+        for code, name in stations.items():
+            if code in dic:
+                lat = dic[code][1]
+                lon = dic[code][0]
+                elev = dic[code][2]
+                db.insert(code,name,lat,lon,elev)
         db.commit()
+        
+        # Save station list as tab-separated text file
+        with open('uk-stations.txt', 'w') as f:
+            output = ['code\tname']
+            for code, name in stations.items():
+                output.append("%s\t%s" % (code, name))
+            f.writelines('\n'.join(output)) 
             
     def loadData(self, command):
+    
+        db = MeasureMonkey('ukair')
+        
+        def retrieve_stationid(code):
+            url = "http://uk-air.defra.gov.uk/data/data_selector"        
+            params = {
+                'q': '519663',
+                'f_statistic_type_id': '9999',
+                'f_limit_was': '1',
+                'submit': 'Save selection',
+                'f_preset_date': '1',
+                'f_site_id[]': code}
+            html = get_html(url, fields=params)
+            m = re.search('q=(\d+)', html)
+            if m:
+                return m.groups(1)[0]
+            else:
+                return None
                 
         def retrieve_data(stationid):
             url = "http://uk-air.defra.gov.uk/data/data_selector"
-            http = urllib3.PoolManager()
-            params = {
-                    'q': '515237',
-                    'f_statistic_type_id': '9999',
+            fields = {
+                    'q': str(stationid),
+                    'type': 'auto',
                     'action': 'step6',
                     'f_limit_was': '1',
-                    'submit': 'Save selection',
-                    'f_preset_date': '1',
-                    'f_site_id[]': stationid}
-            r = http.request('GET', url, fields=params)
-            html = r.data.decode('unicode_escape')
-            return html
-        
-        def get_rows(html):
-            soup = BeautifulSoup(html)
-            table = soup.findAll('table')[0]
-            return table.findAll('tr')
+                    'go': 'Get Data',
+            }
+            return BeautifulSoup(get_html(url, fields=fields))
 
         def get_values(row):
             values = [v.contents[0]
@@ -242,29 +265,37 @@ class UKAir(AirNow):
         
         def insert_row(stationid, thedate, param, value):
             if (param in code_dict) and (value != 'No data') and (value != '&nbsp;'):
-                db2.insert(stationid, thedate, paramkeys[code_dict[param]], int(value))
+                db.insert(stationid, thedate, paramkeys[code_dict[param]], int(value))
                 print ("Insert (%s, %s, %s, %s)" % (stationid, thedate, code_dict[param], int(value)))
+                pass
 
-        db = StationMonkey('ukair')
-        db2 = MeasureMonkey('ukair')
-        cursor = db.db.cursor()
-        cursor.execute("SELECT * from stations;")
-        rows = cursor.fetchall()
-        for row in rows:
-            print(row)
-            stationid = row[0]
-            lat = row[1]
-            lon = row[2]
-            elev = row[3]
-            html = retrieve_data(stationid)
-            rows = get_rows(html)
-            headers = get_column_heads(rows[1])
-            for row in rows[2:]:
-                values = get_values(row)
-                thedate = timestamp(values[0], values[1])
-                for param, val in zip(headers, values):
-                    insert_row(stationid, thedate, param, val)
-        db2.commit()
+        stations = {}
+        with open('uk-stations.txt', 'r') as f:
+            next(f)
+            for line in f:
+                print (line)
+                row = line.strip().split('\t')
+                if len(row) != 2:
+                    continue
+                code, name = row
+                stationid = retrieve_stationid(code)
+                if stationid:
+                    print('code = %s, stationid = %s' % (code, stationid))
+                    soup = retrieve_data(stationid)
+                    tables = soup.findAll('table')
+                    if len(tables) > 0:
+                        table = tables[0]
+                        rows = table.findAll('tr')
+                        print(code, name)
+                        headers = get_column_heads(rows[1])
+                        if len(rows) > 2:
+                            print ('   Data found!')
+                        for row in rows[2:]:
+                            values = get_values(row)
+                            thedate = timestamp(values[0], values[1])
+                            for param, val in zip(headers, values):
+                                insert_row(stationid, thedate, param, val)
+        db.commit()
 
 
 if len(sys.argv)==1:

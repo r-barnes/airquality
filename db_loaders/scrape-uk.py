@@ -6,9 +6,7 @@ from BeautifulSoup import BeautifulSoup
 import json
 import datetime
 import csv
-import airnow
-
-ukair = UKAir()
+import webbrowser
 
 code_dict = {'PM<sub>10</sub>': 'PM10',
              'Dir': 'WD',
@@ -20,19 +18,17 @@ code_dict = {'PM<sub>10</sub>': 'PM10',
              'O<sub>3</sub>': 'OZONE',
              'PM<sub>2.5</sub>': 'PM10'}
 
-def retrieve_data(monitoring_station, **options):
+def retrieve_data(stationid, site_id):
     url = "http://uk-air.defra.gov.uk/data/data_selector"        
     params = {
-        'q': '515237',
+        # 'q': str(stationid),
         'f_statistic_type_id': '9999',
-        'action': 'step6',
+        # 'action': 'step6',
         'f_limit_was': '1',
         'submit': 'Save selection',
         'f_preset_date': '1',
-        'f_site_id[]': monitoring_station,
+        'f_site_id[]': site_id
     }
-    if options:
-        params = dict(params.items() + options.items())
 
     data = urllib.urlencode(params)
     results = urllib2.urlopen(url, data)
@@ -111,8 +107,19 @@ def insert_station(station_code, longitude, latitude, altitude):
     pass
 
 if __name__ == "__main__":
-    scrape_UK()
-    print attributes
+    html = retrieve_data(515258, 'ABD7')
+    with open('index.html', 'w') as f:
+        f.writelines(html)
+        webbrowser.open_new('index.html')
+    soup = BeautifulSoup(html)
+    tables = soup.findAll('table')
+    if len(tables) > 0:
+        table = tables[0]
+        rows = get_rows(table)
+        print rows[0].findAll('th')[1].contents[0]
+
+    
+
         
 
 
