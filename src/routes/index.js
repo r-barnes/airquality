@@ -1,6 +1,7 @@
 var request = require('request');
-var pg = require('pg');
-var url = require('url');
+var pg      = require('pg');
+var url     = require('url');
+var Q       = require('q');
 
 var conString = "postgres://airq:nach0s@localhost:3333/airquality";
 
@@ -69,14 +70,17 @@ exports.stationList = function(req, res) {
 };
 
 function StationNear(lat, lon, limit){
+  var deferred = Q.defer();
   client.query("SELECT * FROM stations ORDER BY pt <-> POINT("+lon+','+lat+") LIMIT $1::INT;", [limit], function(err, result) {
     if(err) {
       res.json(err);
       return console.error('error running query', err);
     }
 
-    return result.rows;
+    deferred.resolve(result.rows);
   });
+
+  return deferred.promise;
 }
 
 //get a list of stations close to a specific longitude and latitude - with a limit
@@ -84,8 +88,9 @@ exports.stationNear = function(req, res) {
   var querySpec = url.parse(req.url, true).query;
   var limit = querySpec.limit === undefined ? 10 : querySpec.limit;
 
-  results=StationNear(req.params.lon, req.params.lat, limit);
-  res.json(results);
+  StationNear(req.params.lon, req.params.lat, limit).then(function(result){
+    res.json(result);
+  });
 };
 
 //send an SMS
