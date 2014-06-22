@@ -2,9 +2,9 @@ var vent = {}; // or App.vent depending how you want to do this
 _.extend(vent, Backbone.Events);
 
 var AppConfig = {
-	station_url: 'http://localhost:4730/v0/stationNear/:lat/:lon?limit=20',
-  masurements_url: 'http://localhost:4730/v0/measurements/:stationid',
-	bounds_url:  'http://localhost:4730/bounds/:north/:south/:east/:west'
+	station_url: 'http://airstatus.info:4730/v0/stationNear/:lat/:lon?limit=20',
+  masurements_url: 'http://airstatus.info:4730/v0/measurements/:stationid',
+	bounds_url:  'http://airstatus.info:4730/bounds/:north/:south/:east/:west'
 };
 
 var MapView = Backbone.View.extend({
