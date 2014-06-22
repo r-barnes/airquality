@@ -2,7 +2,7 @@ var routes     = require('./routes');
 
 var express = require('express');
 var app     = express();
-
+app.use(express.bodyParser());
 
 var allowCrossDomain = function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -19,6 +19,8 @@ app.get('/v0/measurements/:stationId',   routes.measurements  );
 
 app.get('/v0/stationList',         routes.stationList );
 app.get('/v0/stationNear/:lat/:lon',         routes.stationNear );
+
+app.post('/sms', routes.sms );
 
 //app.get('/v0/station/:station', routes.station  );
 

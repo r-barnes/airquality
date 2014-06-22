@@ -82,3 +82,18 @@ exports.stationNear = function(req, res) {
     res.json(result.rows);
   });
 };
+
+//send an SMS
+exports.sms = function(req, res) {
+  console.log('Received ' + req.method + ' request');
+  if (req.method == 'POST') {
+    var from = req.body.From;
+    var to = req.body.To;
+    var message_text = req.body.Body;
+    var media_url = req.body.MediaUrl;
+ }
+  res.writeHead(200, {'Content-Type': 'text/html' });
+  res.end("Thanks!");
+  
+}
+
