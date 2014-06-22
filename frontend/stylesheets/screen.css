@@ -92,8 +92,7 @@ nav {
   left: 0;
   text-align: center;
 }
-
-/* line 31, ../sass/screen.scss */
+/* line 30, ../sass/screen.scss */
 nav .navbutton {
   width: 100px;
   height: 100%;
@@ -105,14 +104,12 @@ nav .navbutton {
   font-size: 20pt;
   font-weight: bold;
 }
-
-/* line 43, ../sass/screen.scss */
+/* line 41, ../sass/screen.scss */
 nav .navbutton a {
   text-decoration: none;
   color: white;
 }
-
-/* line 48, ../sass/screen.scss */
+/* line 46, ../sass/screen.scss */
 nav .navbutton a:hover {
   color: blue;
 }
@@ -129,13 +126,12 @@ nav .navbutton a:hover {
   background-color: #fff;
 }
 
-/* line 63, ../sass/screen.scss */
+/* line 64, ../sass/screen.scss */
 #about h1 {
   font-family: sans-serif;
   text-align: center;
 }
-
-/* line 68, ../sass/screen.scss */
+/* line 69, ../sass/screen.scss */
 #about .centralcol {
   background-color: #efefef;
   width: 100%;
@@ -143,7 +139,6 @@ nav .navbutton a:hover {
   margin: 0 auto;
   height: 100%;
 }
-
 /* line 76, ../sass/screen.scss */
 #about .centralcol img {
   border-radius: 100px;
@@ -151,7 +146,6 @@ nav .navbutton a:hover {
   width: 200px;
   height: 200px;
 }
-
 /* line 83, ../sass/screen.scss */
 #about .centralcol .pic {
   margin-left: 33.3px;

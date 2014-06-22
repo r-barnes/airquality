@@ -145,6 +145,7 @@ var VizView = Backbone.View.extend({
 
   initialize: function(){
   	this.listenTo(vent, "data", this.displayGraph, this);
+    this.listenTo(vent, "vizview:show", this.show, this);
 /*
 	  var dateline = svg.append('line')
 		                    .attr({
@@ -157,15 +158,20 @@ var VizView = Backbone.View.extend({
 		                    .attr('class', 'verticalLine');*/
   },
 
+  show: function(){
+    console.log('Showing vizview');
+    this.$el.addClass('active');
+  },
+
+  hide: function(){
+    this.$el.removeClass('active');
+  },
+
   displayGraph: function(station){
     var measurement_data = AppConfig.masurements_url.replace(':stationid', station);
-    
+
     $.get(measurement_data, {}, function(data, textStatus, jqXHR) {
       console.log(data);
-
-      d3.select("#vizWindow").attr({
-        style: "display: block;"
-      });
 
 
     });
