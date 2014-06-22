@@ -88,7 +88,7 @@ exports.stationNear = function(req, res) {
   var querySpec = url.parse(req.url, true).query;
   var limit = querySpec.limit === undefined ? 10 : querySpec.limit;
 
-  StationNear(req.params.lon, req.params.lat, limit).then(function(result){
+  StationNear(req.params.lat, req.params.lon, limit).then(function(result){
     res.json(result);
   });
 };

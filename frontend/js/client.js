@@ -79,6 +79,7 @@ var MapView = Backbone.View.extend({
     										.replace(':east', ne.lng())
     										.replace(':west', sw.lng());
     $.get(station_url, {}, function(data, textStatus, jqXHR) {
+      console.log(data);
 	    for(var j=0, len=data.length; j<len; j++) {
 	      self.addStation(data[j]);
 	    }
