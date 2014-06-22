@@ -13,48 +13,79 @@ client.connect(function(err){
   }
 });
 
-//get a list of measurements, needs a specific station ID
-exports.measurements = function(req, res) {
-  var station = req.params.stationId;
-  var querySpec = url.parse(req.url, true).query;
-  var limit = querySpec.limit === undefined ? 1000 : querySpec.limit;
+function GetMeasurements(station, limit){
+  var deferred = Q.defer();
+  var jsonOut  = {};
 
-  var jsonOut = {};
-
-  jsonOut.stationInfo = {};
+  jsonOut.stationInfo  = {};
   jsonOut.measurements = [];
 
   client.query('SELECT stationid, system, datetime, definition,' +
     'value FROM measurements,params WHERE param=paramID AND stationid=TEXT($1::TEXT) ORDER BY datetime DESC LIMIT $2::INT;', [station, limit], function(err, result) {
     if(err) {
-      res.json(err);
-      return console.error('error running query', err);
+      console.error('error running query', err);
+      deferred.reject();
     }
 
     jsonOut.measurements = result.rows;
 
     client.query('SELECT stationid, system, name, lat, lon, elev, pt FROM stations WHERE stationid=TEXT($1::TEXT);', [station], function(err2, result2) {
       if(err2) {
-        res.json(err2);
-        return console.error('error running query', err2);
+        console.error('error running query', err2);
+        deferred.reject();
       }
 
       jsonOut.stationInfo = result2.rows[0];
-      res.json(jsonOut);
+      deferred.resolve(jsonOut);
     });
+  });
+
+  return deferred.promise;
+}
+
+//get a list of measurements, needs a specific station ID
+exports.measurements = function(req, res) {
+  var station = req.params.stationId;
+  var querySpec = url.parse(req.url, true).query;
+  var limit = querySpec.limit === undefined ? 1000 : querySpec.limit;
+
+  GetMeasurements(station, limit).then(function(result){
+    console.log(result);
+    res.json(result);
   });
 };
 
+function LastMeas(stationid){
+  var deferred = Q.defer();
+
+  client.query('SELECT stationid, system, datetime, definition, value FROM measurements,params WHERE stationid=$1 ORDER BY datetime DESC LIMIT 30;', [stationid], function(err, result) {
+    if(err) {
+      console.error('error running query', err);
+      deferred.reject();
+    }
+    if(result.rows.length==0){
+      deferred.resolve([]);
+      return;
+    }
+
+    var ret  = {};
+    ret.date = result.rows[0].datetime.toString();
+    ret.meas = [];
+    for(var i=0;i<result.rows.length;i++){
+      console.log(result.rows[i])
+      if(result.rows[i].datetime==ret.date)
+        ret.meas.push({name:result.rows[i].definition, val:result.rows[i].value});
+    }
+    deferred.resolve(ret);
+  });
+
+  return deferred.promise;
+}
+
 //get the last x amount of measurements from all stations
 exports.last = function(req, res) {
-  var limit = req.params.limit;
-  client.query('SELECT stationid, system, datetime, definition,' +
-    'value FROM measurements,params WHERE param=paramID ORDER BY datetime DESC LIMIT $1::INT;', [limit], function(err, result) {
-    if(err) {
-      res.json(err);
-      return console.error('error running query', err);
-    }
-    res.json(result.rows);
+  LastMeas(req.params.stationid).then(function(result){
+    res.json(result);
   });
 };
 
