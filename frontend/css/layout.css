@@ -1,6 +1,45 @@
+html, body {
+  padding: 0;
+  margin:  0;
+}
+
 #map-canvas {
 	width:  100%;
 	height: 100%;
+  top:      66px;
+  left:     0;
+  position: fixed;
+}
+
+nav {
+  width:            100%;
+  background-color: black;
+  height:           66px;
+  position:         fixed;
+  top:              0;
+  left:             0;
+  text-align:       center;
+}
+
+nav .navbutton {
+  width:          100px;
+  height:         100%;
+  text-align:     center;
+  position:       absolute;
+  vertical-align: middle;
+  display:        table-cell;
+  line-height:    66px;
+  font-size:      20pt;
+  font-weight:    bold;
+}
+
+nav .navbutton a {
+  text-decoration: none;
+  color:           white;
+}
+
+nav .navbutton a:hover {
+  color: blue;
 }
 
 #vizview {
@@ -8,4 +47,34 @@
 	width:  100%;
 	height: 50%;
 	top:    50%;
+}
+
+#about h1 {
+  font-family: sans-serif;
+  text-align:  center;
+}
+
+#about .centralcol {
+  background-color: #efefef;
+  width:            100%;
+  max-width:        500px;
+  margin:           0 auto;
+  height:           100%;
+}
+
+#about .centralcol img {
+  border-radius: 100px;
+  margin-bottom: 10px;
+  width:         200px;
+  height:        200px;
+}
+
+#about .centralcol .pic {
+  margin-left: 33.3px;
+  width:       200px;
+  display:     inline-block;
+  text-align:  center;
+  margin-top:  20px;
+  font-weight: bold;
+  font-family: sans-serif;
 }
