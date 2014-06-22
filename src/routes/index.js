@@ -115,13 +115,13 @@ function StationNear(lat, lon, limit){
 }
 
 function xmlResponse(res, message) {
-  
+
   xml = '<?xml version="1.0" encoding="UTF-8"?><Response>' +
         '<Message>' + message + '</Message></Response>';
 
   res.writeHead(200, {'Content-Type': 'text/html' });
   console.log('Response: ', xml);
-  res.end(xml); 
+  res.end(xml);
 }
 
 function getMessage(res, stationid) {
@@ -164,34 +164,31 @@ exports.sms = function(req, res) {
     var media_url = req.body.MediaUrl;
     var lat;
     var lon;
-    var message;  
+    var message;
     if (zipcode.match(/^\d\d\d\d\d$/)) {
       client.query('SELECT lat, lon FROM zips where zip = $1 LIMIT 1;', [zipcode],  function(err, result) {
         if(err) {
           res.json(err);
           return console.error('error running query', err);
         }
-        console.log('result.rows is ', result.rows);
         if (result.rows.length > 0) {
           lat = result.rows[0].lat;
           lon = result.rows[0].lon;
-          console.log('lat ' + lat + ' lon ' + lon);
           StationNear(lat, lon  , 1).then(function(nearest_station){
             nearest_station = nearest_station[0];
             if (typeof(nearest_station) !== 'undefined') {
               stationid = nearest_station.stationid;
-              console.log('stationid is', stationid);
-              getMessage(res, stationid);  
+              getMessage(res, stationid);
             } else {
               xmlResponse(res, "Nearest station not found.");
             }
           });
         } else {
-          console.log("zip code ", zipcode, " not found");
-        }   
+          xmlResponse(res, "I could not find that zipcode!");
+        }
       });
     } else {
-      console.log(zipcode, " is not a valid zip code");
+      xmlResponse(res, "That isn't a valid zipcode!");
     }
   }
 }
