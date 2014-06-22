@@ -7,6 +7,9 @@ import json
 import datetime
 import csv
 import webbrowser
+import re
+
+regex = 'q=(/d+)'
 
 code_dict = {'PM<sub>10</sub>': 'PM10',
              'Dir': 'WD',
