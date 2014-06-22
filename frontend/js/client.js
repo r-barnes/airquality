@@ -229,3 +229,8 @@ function closeWindow(){
     style: "display: none"
   });
 }
+
+
+$('.sms').click(function(){
+  $('#dialog').dialog();
+});

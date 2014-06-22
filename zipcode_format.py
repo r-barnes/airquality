@@ -11,12 +11,10 @@ dbcursor = db.cursor()
 
 input_file = csv.DictReader(open("zipcode.csv"))
 
+dbcursor.execute('DELETE FROM zips')
+
 prepped_data = ""
 for row in input_file:
-  row['latitude']  = float()
-  row['longitude'] = float()
-  row['timezone']  = int(row['timezone'])
-
   prepped_data += ("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (row['zip'], row['city'], row['state'], row['latitude'], row['longitude'], row['timezone'], row['dst']))
 
 prepped_data = io.StringIO(prepped_data)
