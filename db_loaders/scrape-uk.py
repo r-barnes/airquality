@@ -3,10 +3,12 @@
 import urllib
 import urllib2
 from BeautifulSoup import BeautifulSoup
-import webbrowser
 import json
 import datetime
 import csv
+import airnow
+
+ukair = UKAir()
 
 code_dict = {'PM<sub>10</sub>': 'PM10',
              'Dir': 'WD',

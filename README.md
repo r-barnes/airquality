@@ -23,6 +23,7 @@ Then you can tap into the database like so:
 API calls
 /measurements/stationID (optional limit)
 	Get a list of measurements taken from a specific station. Limits at 1000 if one is not specified
+	Returns stationInfo as an object and measurements as an array
 
 /stationList
 	Get a list of stations

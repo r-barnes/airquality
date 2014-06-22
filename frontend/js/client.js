@@ -2,7 +2,8 @@ var vent = {}; // or App.vent depending how you want to do this
 _.extend(vent, Backbone.Events);
 
 var AppConfig = {
-	station_url: 'http://localhost:4730/v0/stations/:lat/:lon',
+	station_url: 'http://localhost:4730/v0/stationNear/:lat/:lon?limit=5',
+  masurements_url: 'http://localhost:4730/v0/measurements/:stationid',
 	bounds_url:  'http://localhost:4730/bounds/:north/:south/:east/:west'
 };
 
@@ -15,21 +16,21 @@ var MapView = Backbone.View.extend({
   },
 
   initialize: function(){
-  	var self=this;
-  	this.stations = {};
+    var self=this;
+    this.stations = {};
 
     self.default_marker_img  = 'img/blue-pin.png';
     self.selected_marker_img = 'img/black-pin.png';
 
 		var map_options = {
-		  center:             new google.maps.LatLng(47.57, -122.31),
-		  zoom:               7,
-		  mapTypeId:          google.maps.MapTypeId.ROADMAP,
-		  panControl:         false,
-		  mapTypeControl:     false,
-		  zoomControl:        true,
-		  zoomControlOptions: { position: google.maps.ControlPosition.LEFT_CENTER },
-		  streetViewControl:  false
+      center:             new google.maps.LatLng(47.57, -122.31),
+      zoom:               7,
+      mapTypeId:          google.maps.MapTypeId.ROADMAP,
+      panControl:         false,
+      mapTypeControl:     false,
+      zoomControl:        true,
+      zoomControlOptions: { position: google.maps.ControlPosition.LEFT_CENTER },
+      streetViewControl:  false
 		};
 		this.map = new google.maps.Map(document.getElementById("map-canvas"), map_options);
 
@@ -84,7 +85,7 @@ var MapView = Backbone.View.extend({
       return; //Yes, it already has a marker. Don't make another!
     }
 
-    console.log('adding station', new_station)
+    console.log('adding station', new_station);
 
 
 
@@ -126,13 +127,11 @@ var MapView = Backbone.View.extend({
       //this.selected_marker.setIcon( AppConfig.transit_mode_icons[this.selected_marker.stop_type].gicon );
     }
 
-    console.log('Made it here');
-
     //Set this marker to use its hover icon
     this.selected_marker=marker;
     this.selected_marker.setIcon(self.selected_marker_img);
 
-    vent.trigger("data", marker.stationid)
+    vent.trigger("data", marker.stationid);
   },
 
 });
@@ -145,7 +144,7 @@ var VizView = Backbone.View.extend({
   el: '#vizview',
 
   initialize: function(){
-  	//this.listenTo(vent, "data", this.displayGraph, this);
+  	this.listenTo(vent, "data", this.displayGraph, this);
 /*
 	  var dateline = svg.append('line')
 		                    .attr({
@@ -159,7 +158,19 @@ var VizView = Backbone.View.extend({
   },
 
   displayGraph: function(station){
-  	var datavar=[];
+    var measurement_data = AppConfig.masurements_url.replace(':stationid', station);
+    
+    $.get(measurement_data, {}, function(data, textStatus, jqXHR) {
+      console.log(data);
+
+      d3.select("#vizWindow").attr({
+        style: "display: block;"
+      });
+
+
+    });
+
+  	/*var datavar=[];
   	var paramtypes=["OZONE","NO","NO2","NO2Y","NOX","NOY","OC","OZONE","PM10","PM2.5","RHUM","SO2"];
   	for(var i=0;i<paramtypes.length;i++){
   		var param=paramtypes[i];
@@ -184,7 +195,7 @@ var VizView = Backbone.View.extend({
       data: datavar
     });
 
-    chart.render();
+    chart.render();*/
   }
 });
 
@@ -202,3 +213,9 @@ var AppRouter = Backbone.Router.extend({
 
 var MapView = new MapView();
 var vizview = new VizView();
+
+function closeWindow(){
+  d3.select("#vizview").attr({
+    style: "display: none"
+  });
+}
