@@ -18,13 +18,29 @@ exports.measurements = function(req, res) {
   var querySpec = url.parse(req.url, true).query;
   var limit = querySpec.limit === undefined ? 1000 : querySpec.limit;
 
+  var jsonOut = {};
+
+  jsonOut.stationInfo = {};
+  jsonOut.measurements = [];
+
   client.query('SELECT stationid, system, datetime, definition,' +
     'value FROM measurements,params WHERE param=paramID AND stationid=TEXT($1::TEXT) ORDER BY datetime DESC LIMIT $2::INT;', [station, limit], function(err, result) {
     if(err) {
       res.json(err);
       return console.error('error running query', err);
     }
-    res.json(result.rows);
+
+    jsonOut.measurements = result.rows;
+
+    client.query('SELECT stationid, system, name, lat, lon, elev, pt FROM stations WHERE stationid=TEXT($1::TEXT);', [station], function(err2, result2) {
+      if(err2) {
+        res.json(err2);
+        return console.error('error running query', err2);
+      }
+
+      jsonOut.stationInfo = result2.rows[0];
+      res.json(jsonOut);
+    });
   });
 };
 
