@@ -1,0 +1,164 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+/* line 17, ../../../../../../var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+/* line 22, ../../../../../../var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+html {
+  line-height: 1;
+}
+
+/* line 24, ../../../../../../var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+ol, ul {
+  list-style: none;
+}
+
+/* line 26, ../../../../../../var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 28, ../../../../../../var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* line 30, ../../../../../../var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+q, blockquote {
+  quotes: none;
+}
+/* line 103, ../../../../../../var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+/* line 32, ../../../../../../var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+a img {
+  border: none;
+}
+
+/* line 116, ../../../../../../var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
+  display: block;
+}
+
+/* line 8, ../sass/screen.scss */
+html, body {
+  padding: 0;
+  margin: 0;
+}
+
+/* line 13, ../sass/screen.scss */
+#map-canvas {
+  width: 100%;
+  height: 100%;
+  top: 66px;
+  left: 0;
+  position: fixed;
+}
+
+/* line 21, ../sass/screen.scss */
+nav {
+  width: 100%;
+  background-color: black;
+  height: 66px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  text-align: center;
+}
+
+/* line 31, ../sass/screen.scss */
+nav .navbutton {
+  width: 100px;
+  height: 100%;
+  text-align: center;
+  position: absolute;
+  vertical-align: middle;
+  display: table-cell;
+  line-height: 66px;
+  font-size: 20pt;
+  font-weight: bold;
+}
+
+/* line 43, ../sass/screen.scss */
+nav .navbutton a {
+  text-decoration: none;
+  color: white;
+}
+
+/* line 48, ../sass/screen.scss */
+nav .navbutton a:hover {
+  color: blue;
+}
+
+/* line 52, ../sass/screen.scss */
+#vizWindow {
+  display: none;
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  top: 30%;
+  left: 30%;
+  z-index: 10;
+  background-color: #fff;
+}
+
+/* line 63, ../sass/screen.scss */
+#about h1 {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+/* line 68, ../sass/screen.scss */
+#about .centralcol {
+  background-color: #efefef;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  height: 100%;
+}
+
+/* line 76, ../sass/screen.scss */
+#about .centralcol img {
+  border-radius: 100px;
+  margin-bottom: 10px;
+  width: 200px;
+  height: 200px;
+}
+
+/* line 83, ../sass/screen.scss */
+#about .centralcol .pic {
+  margin-left: 33.3px;
+  width: 200px;
+  display: inline-block;
+  text-align: center;
+  margin-top: 20px;
+  font-weight: bold;
+  font-family: sans-serif;
+}
