@@ -10,22 +10,9 @@ import urllib3
 from bs4 import BeautifulSoup
 import csv
 import re
+import ukair
 
 paramkeys = {'OZONE': 1, 'PM10': 2, 'PM2.5': 3, 'TEMP':4, 'BARPR': 5, 'SO2': 6, 'RHUM': 7, 'WS': 8, 'WD': 9, 'CO': 10, 'NOY': 11, 'NO2Y': 12, 'NO': 13, 'NOX': 14, 'NO2': 15, 'PRECIP': 16, 'SRAD': 17, 'BC': 18, 'EC': 19, 'OC': 20}
-
-def get_html(url, fields = None):
-    http = urllib3.PoolManager()
-    if fields:
-        r = http.request('GET', url, fields)
-    else:
-        r = http.request('GET', url)
-    html = r.data.decode('unicode_escape')
-    return html
-
-#Example: timestamp('25/12/2014', '13:00:00') = '2014-12-25 13:00:00'
-def timestamp(date, time):
-    dd, mm, yy = date.split('/')
-    return "%s-%s-%s %s" % (yy, mm, dd, time)
 
 class BaseMonkey:
     def __init__(self, system):
@@ -163,55 +150,17 @@ class UKAir(AirNow):
             
     def loadStations(self, command):
         db = StationMonkey('ukair')
-
-        print("Retrieving stations list")
-        
-        # Scrape stations list from uk-air.defra.gov.uk
-        url = "http://uk-air.defra.gov.uk/data/data_selector?q=515239&s=s&o=s&l=1#mid"
-        html = get_html(url)
-        soup = BeautifulSoup(html)
-        select = soup.findAll('select')[0]
-        stations = {}
-        for option in select.findAll('option'):
-            code = str(option['value'])
-            name = str(''.join(option.contents))
-            stations[code] = name
-        
-        # Read latitude, longitude, elevation from AirBase      
-        with open('AirBase_v8_stations.csv', 'rt') as csvfile:
-            reader = csv.reader(csvfile, delimiter='\t')
-            next(reader) # Skip header row
-            dic = {}
-            for row in reader:
-                country_iso_code = row[2]
-                if country_iso_code == 'GB':
-                    code = row[1]
-                    name = row[4]
-                    longitude = float(row[12])
-                    latitude = float(row[13])
-                    altitude = float(row[14])
-                    dic[code] = (longitude, latitude, altitude)
-                    if not (code in stations):
-                        stations[code] = name
-                    
-        # Insert stations
-        for code, name in stations.items():
-            if code in dic:
-                lat = dic[code][1]
-                lon = dic[code][0]
-                elev = dic[code][2]
-                db.insert(code,name,lat,lon,elev)
+        for row in ukair.loadStations():
+            db.insert(*row)
         db.commit()
         
-        # Save station list as tab-separated text file
-        with open('uk-stations.txt', 'w') as f:
-            output = ['code\tname']
-            for code, name in stations.items():
-                output.append("%s\t%s" % (code, name))
-            f.writelines('\n'.join(output)) 
             
     def loadData(self, command):
-        print "Not implemented"
+        db = MeasureMonkey('ukair)
+        for row in ukair.loadData():
+            db.insert(*row)
+        db.commit()
+        
         
 
 
