@@ -11,7 +11,10 @@ paramkeys = {'OZONE': 1, 'PM10': 2, 'PM2.5': 3, 'TEMP':4, 'BARPR': 5, 'SO2': 6, 
 : 17, 'BC': 18, 'EC': 19, 'OC': 20}
 
 # Used to convert descriptions of air quality parameters from the UK Air website
-# to the corresponding codes in the database
+# to the corresponding codes in the database.
+
+# TODO: There are two fields for WD and two for WS. Is this a problem?
+
 ukairkeys = {'1,3-butadiene (1,3-butadiene)' : None, 
              'Carbon monoxide (CO)' : 'CO', 
              'Modelled Temperature (Temp)' : 'TEMP',
