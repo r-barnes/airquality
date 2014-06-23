@@ -62,10 +62,10 @@ def get_lon_lat(item):
     regex = r'Location: (\d+)&deg;(\d+)&acute;(\d+)\.(\d+)&quot;N\s+(\d+)&deg;(\d+)&acute;(\d+)\.(\d+)&quot;([WE])'
     description = item.find('description').text
     m = re.search(regex, description).groups()
-    lon = float(m[0]) + float(m[1])/60 + float(m[2])/3600 + float(m[3])/360000
-    lat = float(m[4]) + float(m[5])/60 + float(m[6])/3600 + float(m[7])/360000
+    lat = float(m[0]) + float(m[1])/60 + float(m[2])/3600 + float(m[3])/360000
+    lon = float(m[4]) + float(m[5])/60 + float(m[6])/3600 + float(m[7])/360000
     if m[8] == 'W':
-       lat = -lat
+       lon = -lon
     return (lon, lat)
 
 # Retrieve the station list
