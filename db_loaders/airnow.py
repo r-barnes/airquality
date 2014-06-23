@@ -7,9 +7,6 @@ import sys
 import io
 import urllib
 import urllib3
-from bs4 import BeautifulSoup
-import csv
-import re
 import ukair
 
 paramkeys = {'OZONE': 1, 'PM10': 2, 'PM2.5': 3, 'TEMP':4, 'BARPR': 5, 'SO2': 6, 'RHUM': 7, 'WS': 8, 'WD': 9, 'CO': 10, 'NOY': 11, 'NO2Y': 12, 'NO': 13, 'NOX': 14, 'NO2': 15, 'PRECIP': 16, 'SRAD': 17, 'BC': 18, 'EC': 19, 'OC': 20}
@@ -151,13 +148,14 @@ class UKAir(AirNow):
     def loadStations(self, command):
         db = StationMonkey('ukair')
         for row in ukair.loadStations():
+            # print ('insert %s' % repr(row))
             db.insert(*row)
         db.commit()
-        
-            
+             
     def loadData(self, command):
-        db = MeasureMonkey('ukair)
+        db = MeasureMonkey('ukair')
         for row in ukair.loadData():
+            # print ('insert %s' % repr(row))
             db.insert(*row)
         db.commit()
         

@@ -79,8 +79,9 @@ def loadStations():
         yield (station_id, station_name, lon, lat, elev)
 
 # TODO: get elevation from longitude and latitude
+# Using -9999 as missing value
 def get_elev(lon, lat):
-    return None
+    return -9999
 
 # Convert date and time to the database format
 def get_date_time(date, time):
