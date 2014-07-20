@@ -195,10 +195,10 @@ var VizView = Backbone.View.extend({
       vent.trigger('vizview:show');
 
       //remove the old svg and redraw it
-      
+
       d3.select("text.loading").remove();
 
-      
+
 
       svg.append("text").attr({
         x: 30,
@@ -208,7 +208,7 @@ var VizView = Backbone.View.extend({
         'font-family': '\'Open Sans\', sans-serif'
       }).classed('stationName', true).text(data.stationInfo.name);
 
-      
+
 
      // console.log(new Date(Date.parse(data.measurements[0].datetime)).getHours());
 
@@ -229,7 +229,7 @@ var VizView = Backbone.View.extend({
         .attr('class', 'x axis')
         .attr('transform', 'translate(' + chartAttr.offsetX + ', ' + (chartAttr.height + chartAttr.offsetY) + ')')
         .call(xAxis)
-        .selectAll("text")  
+        .selectAll("text")
           .style("text-anchor", "end")
           .attr("dx", "-.8em")
           .attr("dy", ".15em")
@@ -255,7 +255,7 @@ var VizView = Backbone.View.extend({
           chartGrp.append("path").datum(dataOfInt).attr("d", function(d){return line(d);})
           .attr("fill", "none")
           .attr("stroke-width", "1")
-          .attr("stroke", colorScale(i)); 
+          .attr("stroke", colorScale(i));
         }
 
         var legend = svg.append("g").attr("transform", "translate(410, 60)");
