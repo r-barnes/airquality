@@ -2,9 +2,9 @@ var vent = {}; // or App.vent depending how you want to do this
 _.extend(vent, Backbone.Events);
 
 var AppConfig = {
-	station_url: 'http://airstatus.info:4730/v0/stationNear/:lat/:lon?limit=20',
-  masurements_url: 'http://airstatus.info:4730/v0/measurements/:stationid',
-	bounds_url:  'http://airstatus.info:4730/bounds/:north/:south/:east/:west'
+	station_url:      'http://localhost:4730/v0/stationNear/:lat/:lon?limit=20',
+  measurements_url: 'http://localhost:4730/v0/measurements/:stationid',
+	bounds_url:       'http://localhost:4730/bounds/:north/:south/:east/:west'
 };
 
 var MapView = Backbone.View.extend({
@@ -172,14 +172,14 @@ var VizView = Backbone.View.extend({
   },
 
     displayGraph: function(station){
-    var measurement_data = AppConfig.masurements_url.replace(':stationid', station);
+    var measurement_data = AppConfig.measurements_url.replace(':stationid', station);
 
     var chartAttr = {};
     chartAttr.width = 400;
     chartAttr.height = 200;
     chartAttr.offsetX = 30;
     chartAttr.offsetY = 50;
-    
+
     d3.select("#vizSvg").remove();
     var svg = d3.select("#vizview").append("svg").attr("id", "vizSvg");
 
