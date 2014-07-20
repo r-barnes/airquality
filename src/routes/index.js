@@ -3,7 +3,7 @@ var pg      = require('pg');
 var url     = require('url');
 var Q       = require('q');
 
-var conString = "postgres://airq:nach0s@localhost:3333/airquality";
+var conString = "postgres://airq:nach0s@localhost:5432/airquality";
 
 var client = new pg.Client(conString);
 
